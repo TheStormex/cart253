@@ -1,5 +1,5 @@
 // Exercise 1 - Movement
-// Pippin Barr
+// Che Tan
 //
 // Starter code for exercise 1.
 // Draws a moving square and circle that intersect
@@ -15,6 +15,13 @@ let squareX;
 let squareY;
 let squareSize = 100;
 
+// Position variables and size for the image
+let imageX;
+let imageY;
+let imageSize = 100;
+
+// Image variable
+let movingImage;
 
 // preload()
 //
@@ -22,8 +29,10 @@ let squareSize = 100;
 
 function preload() {
 
-}
+// Load in the image which will move from left to right
+movingImage = loadImage("assets/images/clown.png");
 
+}
 
 // setup()
 //
@@ -42,13 +51,16 @@ function setup() {
   // We divide the size by two because we're drawing from the center
   squareX = width + squareSize/2;
   squareY = height + squareSize/2;
+  
+  // Start the image at middle left side
+  imageX = 0;
+  imageY = height/2;
 
   // We'll draw rectangles from the center
   rectMode(CENTER);
   // We won't have a stroke in this
   noStroke();
 }
-
 
 // draw()
 //
@@ -73,4 +85,9 @@ function draw() {
   fill(0,0,255,10);
   // Display the square
   rect(squareX,squareY,squareSize,squareSize);
+  
+  // Move the image to the right
+  imageX += 1;
+  // Display the image
+  image(movingImage, imageX, imageY);
 }

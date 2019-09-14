@@ -15,16 +15,23 @@ let squareX;
 let squareY;
 let squareSize = 100;
 
-// Position variables and size for the image
-let imageX;
-let imageY;
-let imageSize = 100;
+// Position variables and size for the first image
+let imageAX;
+let imageAY;
+let imageASize = 100;
 
-// Image variable
-let movingImage;
+// Position variables and size for the second image
+let imageBX;
+let imageBY;
+let imageBSize = 50;
+
+// First Image variable
+let movingImageA;
+
+// Second Image variable
+let movingImageB
 
 // Text variable
-
 let mouseText = "YAY!";
 
 // preload()
@@ -34,7 +41,10 @@ let mouseText = "YAY!";
 function preload() {
 
 // Load in the image which will move from left to right
-movingImage = loadImage("assets/images/clown.png");
+movingImageA = loadImage("assets/images/clown.png");
+
+// Load in the image which will move from bottom to top
+movingImageB = loadImage("assets/images/icon.png");
 
 }
 
@@ -56,9 +66,16 @@ function setup() {
   squareX = width + squareSize/2;
   squareY = height + squareSize/2;
 
-  // Start the image at middle left side
-  imageX = 0;
-  imageY = height/2;
+  // Set the image mode to CENTER so everything crosses in the middle
+  imageMode(CENTER);
+
+  // Start the first image at middle left side
+  imageAX = 0;
+  imageAY = height/2;
+
+  // Start the second image at bottom middle side
+  imageBX = width/2;
+  imageBY = 640;
 
   // We'll draw rectangles from the center
   rectMode(CENTER);
@@ -95,10 +112,15 @@ function draw() {
   // Display the square
   rect(squareX,squareY,squareSize,squareSize);
 
-  // Move the image to the right
-  imageX += 1;
+  // Move the first image to the right
+  imageAX += 1;
   // Display the image
-  image(movingImage, imageX, imageY);
+  image(movingImageA, imageAX, imageAY);
+
+  // Move the second image to the top
+  imageBY -= 1;
+  // Display the image
+  image(movingImageB, imageBX, imageBY);
 
   // Display the text at the mouse location with black color
   fill(0);

@@ -23,6 +23,10 @@ let imageSize = 100;
 // Image variable
 let movingImage;
 
+// Text variable
+
+let mouseText = "YAY!";
+
 // preload()
 //
 // Nothing here
@@ -51,7 +55,7 @@ function setup() {
   // We divide the size by two because we're drawing from the center
   squareX = width + squareSize/2;
   squareY = height + squareSize/2;
-  
+
   // Start the image at middle left side
   imageX = 0;
   imageY = height/2;
@@ -60,6 +64,11 @@ function setup() {
   rectMode(CENTER);
   // We won't have a stroke in this
   noStroke();
+
+  // Set the size of the text to 30
+  textSize(30);
+  // Set the text to the middle of the mouse
+  textAlign(CENTER);
 }
 
 // draw()
@@ -85,9 +94,13 @@ function draw() {
   fill(0,0,255,10);
   // Display the square
   rect(squareX,squareY,squareSize,squareSize);
-  
+
   // Move the image to the right
   imageX += 1;
   // Display the image
   image(movingImage, imageX, imageY);
+
+  // Display the text at the mouse location with black color
+  fill(0);
+  text(mouseText, mouseX, mouseY);
 }

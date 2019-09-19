@@ -46,6 +46,11 @@ function setup() {
 
   // No stroke so it looks cleaner
   noStroke();
+
+  // Set up the text for the score
+  textFont('Helvetica');
+  textAlign(LEFT, TOP);
+  textSize(32);
 }
 
 // draw()
@@ -140,4 +145,7 @@ function draw() {
   // Draw the enemy as a circle
   ellipse(enemyX,enemyY,enemySize,enemySize);
 
+  // Draw the current score in blue
+  fill(0, 100, 255);
+  text(dodges, width/2-10, height/20, width/2, height/15);
 }

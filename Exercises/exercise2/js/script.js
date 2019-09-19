@@ -84,6 +84,19 @@ function draw() {
   avatarVX = 0;
   avatarVY = 0;
 
+  // Set the player's speed to fast if in the leftmost 1/3 of the screen
+  // Normal if in the middle 1/3
+  // slow if in the rightmost 1/3 of the screen
+  if (avatarX <= width/3) {
+    avatarSpeed = 15;
+  }
+  else if (avatarX <= width/3*2) {
+    avatarSpeed = 10;
+  }
+  else {
+    avatarSpeed = 5;
+  }
+
   // Check which keys are down and set the avatar's velocity based on its
   // speed appropriately
 

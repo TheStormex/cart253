@@ -29,6 +29,25 @@ let enemyVX = 5;
 // How many dodges the player has made
 let dodges = 0;
 
+// Declare player avatar image variable
+let avatarImage;
+
+// Declare enemy image variable
+let enemyImage;
+
+// Declare background image variable
+let backgroundImage;
+
+// preload()
+// for the images
+
+function preload() {
+  // Load in all images
+  avatarImage = loadImage("assets/images/player.png");
+  enemyImage = loadImage("assets/images/enemy.png");
+  backgroundImage = loadImage("assets/images/background.png");
+}
+
 // setup()
 //
 // Make the canvas, position the avatar and anemy
@@ -145,17 +164,16 @@ function draw() {
   // Display the number of successful dodges in the console
   console.log(dodges);
 
-  // The player is black
+  // Draw the background image
+  image(backgroundImage, 0, 0, width, height);
+
+  // Draw the player avatar image
+  image(avatarImage, avatarX, avatarY, avatarSize, avatarSize);
+
+  // Draw the enemy image
+  image(enemyImage, enemyX, enemyY, enemySize, enemySize);
+
+  // Draw the current score in black
   fill(0);
-  // Draw the player as a circle
-  ellipse(avatarX,avatarY,avatarSize,avatarSize);
-
-  // The enemy is red
-  fill(255,0,0);
-  // Draw the enemy as a circle
-  ellipse(enemyX,enemyY,enemySize,enemySize);
-
-  // Draw the current score in blue
-  fill(0, 100, 255);
   text(dodges, width/2-10, height/20, width/2, height/15);
 }

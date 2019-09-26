@@ -17,6 +17,11 @@ let targetX;
 let targetY;
 let targetImage;
 
+// Speed and velocity of the target image when it moves
+let targetSpeed = 10;
+let targetVelocityX = targetSpeed;
+let targetVelocityY = targetSpeed;
+
 // The ten decoy images
 let decoyImage1;
 let decoyImage2;
@@ -138,33 +143,46 @@ function setup() {
 // otherwise nothing (all the gameplay stuff is in mousePressed())
 function draw() {
 
-// Add a UI box at the top right corner for the image to search
-fill(255);
-rect(width-width/5,0,width/5,height/5);
+  if (!gameOver) {
+    // Add a UI box at the top right corner for the image to search
+    fill(255);
+    rect(width-width/5,0,width/5,height/5);
 
-// Draw the target image in the middle of the UI box
-image(targetImage,width-width/10,height/10)
+    // Draw the target image in the middle of the UI box
+    image(targetImage,width-width/10,height/10)
 
-// Write the text for what to search
-textFont("Helvetica");
-textSize(30);
-textAlign(CENTER,CENTER);
-fill(0);
-strokeWeight(1);
-text("Find this image!", width-width/10, height/6);
+    // Write the text for what to search
+    textFont("Helvetica");
+    textSize(30);
+    textAlign(CENTER,CENTER);
+    fill(0);
+    strokeWeight(1);
+    text("Find this image!", width-width/10, height/6);
+  }
 
   if (gameOver) {
-    textSize(150);
-    // White text
-    fill(255);
-    // Tell them they won!
-    text("YOU WINNED!",width/2,height/2);
+    // Make the target image move around and bounce on the walls
+    if (targetX+targetImage.width/2+targetVelocityX > width || targetX-targetImage.width/2+targetVelocityX < 0) {
+      targetVelocityX = targetVelocityX*-1;
+    }
+    if (targetY+targetImage.height/2+targetVelocityY > height || targetY-targetImage.height/2+targetVelocityY < 0) {
+      targetVelocityY = targetVelocityY*-1;
+    }
+    targetX+=targetVelocityX;
+    targetY+=targetVelocityY;
+    image(targetImage,targetX,targetY);
     // Draw a blinking circle around the sausage dog to show where it is
     // (even though they already know because they found it!)
     noFill();
     strokeWeight(5);
     stroke(random(255),random(255),random(255));
     ellipse(targetX,targetY,targetImage.width,targetImage.height);
+    // Set text size for the victory message
+    textSize(150);
+    // White text
+    fill(255);
+    // Tell them they won!
+    text("YOU WINNED!",width/2,height/2);
     // Draw a next level button
     stroke(0);
     strokeWeight(1);

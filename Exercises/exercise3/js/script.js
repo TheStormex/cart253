@@ -139,29 +139,46 @@ function setup() {
 function draw() {
 
 // Add a UI box at the top right corner for the image to search
+fill(255);
 rect(width-width/5,0,width/5,height/5);
 
 // Draw the target image in the middle of the UI box
 image(targetImage,width-width/10,height/10)
 
-  if (gameOver) {
-    // Prepare our typography
-    textFont("Helvetica");
-    textSize(128);
-    textAlign(CENTER,CENTER);
-    noStroke();
-    fill(random(255));
+// Write the text for what to search
+textFont("Helvetica");
+textSize(30);
+textAlign(CENTER,CENTER);
+fill(0);
+strokeWeight(1);
+text("Find this image!", width-width/10, height/6);
 
+  if (gameOver) {
+    textSize(150);
+    // White text
+    fill(255);
     // Tell them they won!
     text("YOU WINNED!",width/2,height/2);
-
-    // Draw a circle around the sausage dog to show where it is (even though
-    // they already know because they found it!)
+    // Draw a blinking circle around the sausage dog to show where it is
+    // (even though they already know because they found it!)
     noFill();
-    stroke(random(255));
-    strokeWeight(10);
+    strokeWeight(5);
+    stroke(random(255),random(255),random(255));
     ellipse(targetX,targetY,targetImage.width,targetImage.height);
-  }
+    // Draw a next level button
+    stroke(0);
+    strokeWeight(1);
+    fill(0, 255, 0);
+    rect(width/2+width/20,height-height/4,width/5,height/5);
+    textSize(30);
+    fill(255);
+    text("Next Level",width/2+width/20+width/10,height-height/4+height/10)
+    // Draw a reset game button
+    fill(255, 0, 0);
+    rect(width/2-width/5-width/20,height-height/4,width/5,height/5);
+    fill(255);
+    text("Reset Game",width/2-width/5-width/20+width/10,height-height/4+height/10)
+    }
 }
 
 // mousePressed()
@@ -178,5 +195,8 @@ function mousePressed() {
     if (mouseY > targetY - targetImage.height/2 && mouseY < targetY + targetImage.height/2) {
       gameOver = true;
     }
+  }
+  // if the next level or reset game buttons are pressed
+  if (gameOver) {
   }
 }

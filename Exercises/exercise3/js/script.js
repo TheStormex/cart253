@@ -36,6 +36,13 @@ let numDecoys = 100;
 // Keep track of whether they've won
 let gameOver = false;
 
+// Declare the x and y variables for decoy images location
+let x
+let y
+
+// The distance from the borders of the screen to limit the spawning
+let limit = 12
+
 // preload()
 //
 // Loads the target and decoy images before the program starts
@@ -66,8 +73,14 @@ function setup() {
   // Use a for loop to draw as many decoys as we need
   for (let i = 0; i < numDecoys; i++) {
     // Choose a random location on the canvas for this decoy
-    let x = random(0,width);
-    let y = random(0,height);
+    // That is not in the UI box and with the minimum of the image
+    // Being outside the canvas
+    x = random(width/limit,width-width/limit);
+    if (x > width-width/5-width/limit) {
+      y = random(height/5+height/limit,height-height/limit);
+    } else {
+      y = random(height/limit,height-height/limit);
+    }
     // Generate a random number we can use for probability
     let r = random();
     // Use the random number to display one of the ten decoy
@@ -107,8 +120,12 @@ function setup() {
   }
 
   // Once we've displayed all decoys, we choose a random location for the target
-  targetX = random(0,width);
-  targetY = random(0,height);
+  targetX = random(width/limit,width-width/limit);
+  if (targetX > width-width/5-width/limit) {
+    targetY = random(height/5+height/limit,height-height/limit);
+  } else {
+    targetY = random(height/limit,height-height/limit);
+  }
 
   // And draw it (because it's the last thing drawn, it will always be on top)
   image(targetImage,targetX,targetY);
@@ -120,6 +137,13 @@ function setup() {
 // Displays the game over screen if the player has won,
 // otherwise nothing (all the gameplay stuff is in mousePressed())
 function draw() {
+
+// Add a UI box at the top right corner for the image to search
+rect(width-width/5,0,width/5,height/5);
+
+// Draw the target image in the middle of the UI box
+image(targetImage,width-width/10,height/10)
+
   if (gameOver) {
     // Prepare our typography
     textFont("Helvetica");

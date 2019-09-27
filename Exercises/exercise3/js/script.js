@@ -16,11 +16,14 @@ https://creativenerds.co.uk/freebies/80-free-wildlife-icons-the-best-ever-animal
 let targetX;
 let targetY;
 let targetImage;
+// Size of target imagw
+let targetSizeHor
+let targetSizeVert
 
 // Speed and velocity of the target image when it moves
 let targetSpeed = 10;
-let targetVelocityX = targetSpeed;
-let targetVelocityY = targetSpeed;
+let targetVelocityX
+let targetVelocityY
 
 // The ten decoy images
 let decoyImage1;
@@ -46,7 +49,13 @@ let x
 let y
 
 // The distance from the borders of the screen to limit the spawning
-let limit = 12
+let limit = 12;
+
+// The level the player is on
+let currentLevel = 0;
+
+// To make sure everything in game over is spawned before the buttons work
+let playAgain = false;
 
 // preload()
 //
@@ -72,9 +81,97 @@ function preload() {
 // of decoys in random positions, then the target
 function setup() {
   createCanvas(windowWidth,windowHeight);
-  background("#ffff00");
   imageMode(CENTER);
+  createLevel();
+}
 
+
+// draw()
+//
+// Displays the game over screen if the player has won,
+// otherwise nothing (all the gameplay stuff is in mousePressed())
+function draw() {
+  if (gameOver) {
+    // Make the target image move around and bounce on the walls
+    if (targetX+targetImage.width/2+targetVelocityX > width || targetX-targetImage.width/2+targetVelocityX < 0) {
+      targetVelocityX = targetVelocityX*-1;
+    }
+    if (targetY+targetImage.height/2+targetVelocityY > height || targetY-targetImage.height/2+targetVelocityY < 0) {
+      targetVelocityY = targetVelocityY*-1;
+    }
+    targetX+=targetVelocityX;
+    targetY+=targetVelocityY;
+    image(targetImage,targetX,targetY);
+    // Draw a blinking circle around the sausage dog to show where it is
+    // (even though they already know because they found it!)
+    noFill();
+    strokeWeight(5);
+    stroke(random(255),random(255),random(255));
+    ellipse(targetX,targetY,targetImage.width,targetImage.height);
+    // Set text size for the victory message
+    textSize(150);
+    // White text
+    fill(255);
+    // Tell them they won!
+    text("YOU WINNED!",width/2,height/2);
+    // Draw a next level button
+    stroke(0);
+    strokeWeight(1);
+    fill(0, 255, 0);
+    rect(width/2+width/20,height-height/4,width/5,height/5);
+    textSize(30);
+    fill(255);
+    text("Next Level",width/2+width/20+width/10,height-height/4+height/10)
+    // Draw a reset game button
+    fill(255, 0, 0);
+    rect(width/2-width/5-width/20,height-height/4,width/5,height/5);
+    fill(255);
+    text("Reset Game",width/2-width/5-width/20+width/10,height-height/4+height/10)
+    playAgain = true;
+    }
+}
+
+// mousePressed()
+//
+// Checks if the player clicked on the target and if so tells them they won
+function mousePressed() {
+  // The mouse was clicked!
+  // Check if the cursor is in the x range of the target
+  // (We're subtracting the image's width/2 because we're using imageMode(CENTER) -
+  // the key is we want to determine the left and right edges of the image.)
+  if (mouseX > targetX - targetImage.width/2 && mouseX < targetX + targetImage.width/2) {
+    // Check if the cursor is also in the y range of the target
+    // i.e. check if it's within the top and bottom of the image
+    if (mouseY > targetY - targetImage.height/2 && mouseY < targetY + targetImage.height/2) {
+      gameOver = true;
+    }
+  }
+  // if the next level or reset game buttons are pressed
+  if (gameOver) {
+    if (playAgain) {
+      if (mouseX > width/2+width/20 && mouseX < width/2+width/20+width/5) {
+        if (mouseY > height-height/4 && mouseY < height-height/4+height/5) {
+          gameOver = false;
+          createLevel();
+        }
+      }
+      if (mouseX > width/2-width/5-width/20 && mouseX < width/2-width/5-width/20+width/5) {
+        if (mouseY > height-height/4 && mouseY < height-height/4+height/5) {
+          gameOver = false;
+          restartGame();
+        }
+      }
+    }
+  }
+}
+
+// Create the level
+function createLevel() {
+  clear();
+  background("#ffff00");
+  playAgain = false;
+  currentLevel++;
+  numDecoys = 25*currentLevel+75;
   // Use a for loop to draw as many decoys as we need
   for (let i = 0; i < numDecoys; i++) {
     // Choose a random location on the canvas for this decoy
@@ -132,89 +229,34 @@ function setup() {
     targetY = random(height/limit,height-height/limit);
   }
 
+  // Set the size of the target image to 85% of previous level
+  targetSizeHor = pow(0.85, currentLevel-1)*width/10;
+  targetSizeVert = pow(0.85, currentLevel-1)*height/6;
   // And draw it (because it's the last thing drawn, it will always be on top)
-  image(targetImage,targetX,targetY);
+  image(targetImage,targetX,targetY,targetSizeHor,targetSizeVert);
+
+  // Set the movement of the target image if clicked
+  targetVelocityX = int(random(targetSpeed-6, targetSpeed+6));
+  targetVelocityY = int(random(targetSpeed-6, targetSpeed+6));
+  // Add a UI box at the top right corner for the image to search
+  fill(255);
+  rect(width-width/5,0,width/5,height/5);
+
+  // Draw the target image in the middle of the UI box
+  image(targetImage,width-width/10,height/10)
+
+  // Write the text for what to search
+  textFont("Helvetica");
+  textSize(30);
+  textAlign(CENTER,CENTER);
+  fill(0);
+  strokeWeight(1);
+  text("Find this image!", width-width/10, height/6);
+  text(currentLevel, width-width/10, height/30);
 }
 
-
-// draw()
-//
-// Displays the game over screen if the player has won,
-// otherwise nothing (all the gameplay stuff is in mousePressed())
-function draw() {
-
-  if (!gameOver) {
-    // Add a UI box at the top right corner for the image to search
-    fill(255);
-    rect(width-width/5,0,width/5,height/5);
-
-    // Draw the target image in the middle of the UI box
-    image(targetImage,width-width/10,height/10)
-
-    // Write the text for what to search
-    textFont("Helvetica");
-    textSize(30);
-    textAlign(CENTER,CENTER);
-    fill(0);
-    strokeWeight(1);
-    text("Find this image!", width-width/10, height/6);
-  }
-
-  if (gameOver) {
-    // Make the target image move around and bounce on the walls
-    if (targetX+targetImage.width/2+targetVelocityX > width || targetX-targetImage.width/2+targetVelocityX < 0) {
-      targetVelocityX = targetVelocityX*-1;
-    }
-    if (targetY+targetImage.height/2+targetVelocityY > height || targetY-targetImage.height/2+targetVelocityY < 0) {
-      targetVelocityY = targetVelocityY*-1;
-    }
-    targetX+=targetVelocityX;
-    targetY+=targetVelocityY;
-    image(targetImage,targetX,targetY);
-    // Draw a blinking circle around the sausage dog to show where it is
-    // (even though they already know because they found it!)
-    noFill();
-    strokeWeight(5);
-    stroke(random(255),random(255),random(255));
-    ellipse(targetX,targetY,targetImage.width,targetImage.height);
-    // Set text size for the victory message
-    textSize(150);
-    // White text
-    fill(255);
-    // Tell them they won!
-    text("YOU WINNED!",width/2,height/2);
-    // Draw a next level button
-    stroke(0);
-    strokeWeight(1);
-    fill(0, 255, 0);
-    rect(width/2+width/20,height-height/4,width/5,height/5);
-    textSize(30);
-    fill(255);
-    text("Next Level",width/2+width/20+width/10,height-height/4+height/10)
-    // Draw a reset game button
-    fill(255, 0, 0);
-    rect(width/2-width/5-width/20,height-height/4,width/5,height/5);
-    fill(255);
-    text("Reset Game",width/2-width/5-width/20+width/10,height-height/4+height/10)
-    }
-}
-
-// mousePressed()
-//
-// Checks if the player clicked on the target and if so tells them they won
-function mousePressed() {
-  // The mouse was clicked!
-  // Check if the cursor is in the x range of the target
-  // (We're subtracting the image's width/2 because we're using imageMode(CENTER) -
-  // the key is we want to determine the left and right edges of the image.)
-  if (mouseX > targetX - targetImage.width/2 && mouseX < targetX + targetImage.width/2) {
-    // Check if the cursor is also in the y range of the target
-    // i.e. check if it's within the top and bottom of the image
-    if (mouseY > targetY - targetImage.height/2 && mouseY < targetY + targetImage.height/2) {
-      gameOver = true;
-    }
-  }
-  // if the next level or reset game buttons are pressed
-  if (gameOver) {
-  }
+// Reset all stats and restart the game
+function restartGame() {
+  currentLevel = 0;
+  createLevel();
 }

@@ -21,20 +21,20 @@ let gameOver = false;
 // Player position, size, velocity
 let playerX;
 let playerY;
-let playerRadius = 25;
+let playerSize = 50;
 let playerVX = 0;
 let playerVY = 0;
 let playerMaxSpeed = 2;
 // Player health
 let playerHealth;
-let playerMaxHealth = 255;
+let playerMaxHealth = 300;
 // Player fill color
 let playerFill = 50;
 
 // Prey position, size, velocity
 let preyX;
 let preyY;
-let preyRadius = 25;
+let preySize = 50;
 let preyVX;
 let preyVY;
 let preyMaxSpeed = 4;
@@ -45,20 +45,44 @@ let preyMaxHealth = 100;
 let preyFill = 200;
 
 // Amount of health obtained per frame of "eating" (overlapping) the prey
-let eatHealth = 10;
+let eatHealth = 3;
 // Number of prey eaten during the game (the "score")
 let preyEaten = 0;
 // Stats for noise
 let tx;
 let ty;
+//  All game images
+let playerAImage;
+let playerBImage;
+let preyAImage;
+let preyBImage;
+let projectileImage;
+let garlicImage;
+let holyWaterImage;
+
+// Stats for projectiles
+let ammo = 3;
+let splashDiameter = width/5;
+let shootRate = 1;
+
+// preload()
+//
+// Sets up the images
+function preload() {
+  playerAImage = loadImage("assets/images/bat1.png")
+  playerBImage = loadImage("assets/images/bat2.png")
+  garlicImage = loadImage("assets/images/garlic.png")
+  holyWaterImage = loadImage("assets/images/holyWater.png")
+  preyAImage = loadImage("assets/images/person1.png")
+  preyBImage = loadImage("assets/images/person2.png")
+  projectileImage = loadImage("assets/images/blood.png")
+}
 
 // setup()
 //
 // Sets up the basic elements of the game
 function setup() {
   createCanvas(500, 500);
-
-  noStroke();
 
   // We're using simple functions to separate code out
   setupPrey();
@@ -96,6 +120,7 @@ function setupPlayer() {
 // displays the two agents.
 // When the game is over, shows the game over screen.
 function draw() {
+  clear();
   background(245, 217, 155);
 
   if (!gameOver) {
@@ -109,6 +134,7 @@ function draw() {
 
     drawPrey();
     drawPlayer();
+    drawUI();
   }
   else {
     showGameOver();
@@ -161,13 +187,13 @@ function movePlayer() {
     playerX = playerX - width;
   }
 
-  if (playerY < 0) {
+  if (playerY < height/8) {
     // Off the top, so add the height to reset to the bottom
-    playerY = playerY + height;
+    playerY = height;
   }
   else if (playerY > height) {
     // Off the bottom, so subtract the height to reset to the top
-    playerY = playerY - height;
+    playerY = height/8;
   }
 }
 
@@ -177,7 +203,7 @@ function movePlayer() {
 // Check if the player is dead
 function updateHealth() {
   // Reduce player health
-  playerHealth = playerHealth - 0.5;
+  playerHealth = playerHealth - 1;
   // Constrain the result to a sensible range
   playerHealth = constrain(playerHealth, 0, playerMaxHealth);
   // Check if the player is dead (0 health)
@@ -194,7 +220,7 @@ function checkEating() {
   // Get distance of player to prey
   let d = dist(playerX, playerY, preyX, preyY);
   // Check if it's an overlap
-  if (d < playerRadius + preyRadius) {
+  if (d < playerSize + preySize) {
     // Increase the player health
     playerHealth = playerHealth + eatHealth;
     // Constrain to the possible range
@@ -209,10 +235,11 @@ function checkEating() {
       // Move the "new" prey to a random position
       preyX = random(0, width);
       preyY = random(0, height);
-      // Give it full health
-      preyHealth = preyMaxHealth;
       // Track how many prey were eaten
       preyEaten = preyEaten + 1;
+      // Give it full health
+      preyMaxHealth = 100*preyEaten/4+100;
+      preyHealth = preyMaxHealth;
     }
   }
 }
@@ -225,9 +252,9 @@ function movePrey() {
   preyVX = map(noise(tx),0,1,-preyMaxSpeed,preyMaxSpeed);
   preyVY = map(noise(ty),0,1,-preyMaxSpeed,preyMaxSpeed);
 
-  // Update prey position based on velocity
-  preyX = preyX + preyVX;
-  preyY = preyY + preyVY;
+  // Update prey position based on velocity, velocity increases more preys eaten
+  preyX = preyX + preyVX*preyEaten/6+preyVX;
+  preyY = preyY + preyVY*preyEaten/6+preyVY;
 
   // Change value for noise
   tx += 0.03;
@@ -241,28 +268,40 @@ function movePrey() {
     preyX = preyX - width;
   }
 
-  if (preyY < 0) {
-    preyY = preyY + height;
+  if (preyY < height/8) {
+    preyY = height;
   }
   else if (preyY > height) {
-    preyY = preyY - height;
+    preyY = height/8;
   }
 }
 
 // drawPrey()
 //
-// Draw the prey as an ellipse with alpha based on health
+// Draw the prey with alpha based on health
 function drawPrey() {
-  fill(preyFill, preyHealth);
-  ellipse(preyX, preyY, preyRadius * 2);
+  image(preyAImage, preyX, preyY, preySize/3, preySize);
 }
 
 // drawPlayer()
 //
-// Draw the player as an ellipse with alpha value based on health
+// Draw the player with alpha value based on health
 function drawPlayer() {
-  fill(playerFill, playerHealth);
-  ellipse(playerX, playerY, playerRadius * 2);
+  image(playerAImage, playerX, playerY, playerSize, playerSize/3);
+}
+
+// drawUI()
+//
+// Draw the UI at the top of the page
+function drawUI() {
+  fill(255);
+  rect(0,0,width-1,height/8);
+  textSize(20);
+  fill(0);
+  text("Player Health: " + playerHealth + "/" + playerMaxHealth, width/50, height/20);
+  text("Prey Health: " + preyHealth + "/" + preyMaxHealth, width/50, height/10);
+  text("Ammo: " + ammo, width/2, height/20);
+  text("Prey Eaten: " + preyEaten, width/2, height/10);
 }
 
 // showGameOver()

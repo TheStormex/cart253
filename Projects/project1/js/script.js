@@ -30,7 +30,8 @@ let playerHealth;
 let playerMaxHealth = 300;
 // Player fill color
 let playerFill = 50;
-
+// Check if the player is sprinting
+let playerSprinting = false;
 // Prey position, size, velocity
 let preyX;
 let preyY;
@@ -62,8 +63,13 @@ let holyWaterImage;
 
 // Stats for projectiles
 let ammo = 3;
-let splashDiameter = width/5;
+let splashDiameter;
 let shootRate = 1;
+
+// Variables for timing changing sprites
+let playerSpriteChange = 0;
+let preySpriteChange = 0;
+let playerSpriteChangeSpeed = 500;
 
 // preload()
 //
@@ -145,6 +151,17 @@ function draw() {
 //
 // Checks arrow keys and adjusts player velocity accordingly
 function handleInput() {
+  // Check if the player is sprinting
+  if (keyIsDown(SHIFT)) {
+    playerSprinting = true;
+    playerMaxSpeed = 4;
+    playerSpriteChangeSpeed = 250;
+  }
+  if (!keyIsDown(SHIFT)) {
+    playerSprinting = false;
+    playerMaxSpeed = 2;
+    playerSpriteChangeSpeed = 500;
+  }
   // Check for horizontal movement
   if (keyIsDown(LEFT_ARROW)) {
     playerVX = -playerMaxSpeed;
@@ -202,8 +219,13 @@ function movePlayer() {
 // Reduce the player's health (happens every frame)
 // Check if the player is dead
 function updateHealth() {
-  // Reduce player health
-  playerHealth = playerHealth - 1;
+  // Reduce player health depending on if player is sprinting
+  if (!playerSprinting) {
+    playerHealth = playerHealth - 1;
+  }
+  if (playerSprinting) {
+    playerHealth = playerHealth - 2;
+  }
   // Constrain the result to a sensible range
   playerHealth = constrain(playerHealth, 0, playerMaxHealth);
   // Check if the player is dead (0 health)
@@ -278,16 +300,32 @@ function movePrey() {
 
 // drawPrey()
 //
-// Draw the prey with alpha based on health
+// Draw the prey which changes sprite every half second
 function drawPrey() {
-  image(preyAImage, preyX, preyY, preySize/3, preySize);
+  if (millis() - preySpriteChange < 500) {
+    image(preyAImage, preyX, preyY, preySize/3, preySize);
+  }
+  if (millis() - preySpriteChange >= 500) {
+    image(preyBImage, preyX, preyY, preySize/3, preySize);
+  }
+  if (millis() - preySpriteChange >= 1000) {
+    preySpriteChange = millis();
+  }
 }
 
 // drawPlayer()
 //
-// Draw the player with alpha value based on health
+// Draw the player which changes sprite every half second, 2x faster if sprinting
 function drawPlayer() {
-  image(playerAImage, playerX, playerY, playerSize, playerSize/3);
+  if (millis() - playerSpriteChange < playerSpriteChangeSpeed) {
+    image(playerAImage, playerX, playerY, playerSize, playerSize/3);
+  }
+  if (millis() - playerSpriteChange >= playerSpriteChangeSpeed) {
+    image(playerBImage, playerX, playerY, playerSize, playerSize/3);
+  }
+  if (millis() - playerSpriteChange >= playerSpriteChangeSpeed*2) {
+    playerSpriteChange = millis();
+  }
 }
 
 // drawUI()
@@ -300,8 +338,9 @@ function drawUI() {
   fill(0);
   text("Player Health: " + playerHealth + "/" + playerMaxHealth, width/50, height/20);
   text("Prey Health: " + preyHealth + "/" + preyMaxHealth, width/50, height/10);
-  text("Ammo: " + ammo, width/2, height/20);
-  text("Prey Eaten: " + preyEaten, width/2, height/10);
+  text("Ammo: " + ammo, width/2-width/20, height/20);
+  text("Prey Eaten: " + preyEaten, width/2-width/20, height/10);
+  text("Sprinting? " + playerSprinting, width-width/3.5, height/20);
 }
 
 // showGameOver()

@@ -27,7 +27,7 @@ let playerVY = 0;
 let playerMaxSpeed = 2;
 // Player health
 let playerHealth;
-let playerMaxHealth = 300;
+let playerMaxHealth = 500;
 // Player fill color
 let playerFill = 50;
 // Check if the player is sprinting
@@ -61,15 +61,24 @@ let projectileImage;
 let garlicImage;
 let holyWaterImage;
 
-// Stats for projectiles
+// Stats for the player's projectile
 let ammo = 3;
-let splashDiameter;
+
+// The rate at which the prey fires the projectile
 let shootRate = 1;
 
 // Variables for timing changing sprites
 let playerSpriteChange = 0;
 let preySpriteChange = 0;
 let playerSpriteChangeSpeed = 500;
+
+// Garlic location
+let garlicX
+let garlicY
+let garlicVX = 1;
+let garlicVY = 1;
+let garlicSize = 20;
+
 
 // preload()
 //
@@ -89,10 +98,10 @@ function preload() {
 // Sets up the basic elements of the game
 function setup() {
   createCanvas(500, 500);
-
   // We're using simple functions to separate code out
   setupPrey();
   setupPlayer();
+  setupGarlic();
 }
 
 // setupPrey()
@@ -118,6 +127,11 @@ function setupPlayer() {
   playerHealth = playerMaxHealth;
 }
 
+function setupGarlic() {
+  garlicX = int(random(0, width));
+  garlicY = int(random(height/8, height));
+}
+
 // draw()
 //
 // While the game is active, checks input
@@ -127,7 +141,7 @@ function setupPlayer() {
 // When the game is over, shows the game over screen.
 function draw() {
   clear();
-  background(245, 217, 155);
+  background(225, 255, 255);
 
   if (!gameOver) {
     handleInput();
@@ -140,6 +154,7 @@ function draw() {
 
     drawPrey();
     drawPlayer();
+    drawGarlic();
     drawUI();
   }
   else {
@@ -149,24 +164,24 @@ function draw() {
 
 // handleInput()
 //
-// Checks arrow keys and adjusts player velocity accordingly
+// Checks WASD keys and adjusts player velocity accordingly
 function handleInput() {
-  // Check if the player is sprinting
-  if (keyIsDown(SHIFT)) {
+  // Check if the player is sprinting with the Spacebar
+  if (keyIsDown(32)) {
     playerSprinting = true;
     playerMaxSpeed = 4;
     playerSpriteChangeSpeed = 250;
   }
-  if (!keyIsDown(SHIFT)) {
+  if (!keyIsDown(32)) {
     playerSprinting = false;
     playerMaxSpeed = 2;
     playerSpriteChangeSpeed = 500;
   }
   // Check for horizontal movement
-  if (keyIsDown(LEFT_ARROW)) {
+  if (keyIsDown(65)) {
     playerVX = -playerMaxSpeed;
   }
-  else if (keyIsDown(RIGHT_ARROW)) {
+  else if (keyIsDown(68)) {
     playerVX = playerMaxSpeed;
   }
   else {
@@ -174,10 +189,10 @@ function handleInput() {
   }
 
   // Check for vertical movement
-  if (keyIsDown(UP_ARROW)) {
+  if (keyIsDown(87)) {
     playerVY = -playerMaxSpeed;
   }
-  else if (keyIsDown(DOWN_ARROW)) {
+  else if (keyIsDown(83)) {
     playerVY = playerMaxSpeed;
   }
   else {
@@ -259,11 +274,31 @@ function checkEating() {
       preyY = random(0, height);
       // Track how many prey were eaten
       preyEaten = preyEaten + 1;
+      // Increase the speed of the garlic
+      if (garlicVX > 0) {
+        garlicVX = int(random(preyEaten+1*0.5, preyEaten+1*1.5));
+      }
+      if (garlicVX < 0) {
+        garlicVX = -(int(random(preyEaten+1*0.5, preyEaten+1*1.5)));
+      }
+      if (garlicVY > 0) {
+        garlicVY = int(random(preyEaten+1*0.5, preyEaten+1*1.5));
+      }
+      if (garlicVY < 0) {
+        garlicVY = -(int(random(preyEaten+1*0.5, preyEaten+1*1.5)));
+      }
       // Give it full health
       preyMaxHealth = 100*preyEaten/4+100;
       preyHealth = preyMaxHealth;
     }
   }
+}
+
+// checkHit()
+//
+// Check if player is hitting obstacles like the Holy Water or Garlic
+function checkHit() {
+
 }
 
 // movePrey()
@@ -328,6 +363,23 @@ function drawPlayer() {
   }
 }
 
+// drawGarlic()
+//
+// Draw the garlic obstacle which bounces on the walls
+function drawGarlic(){
+  if (garlicX + garlicVX > width || garlicX + garlicVX < 0) {
+    garlicVX *= random(0.5,1.5);
+    garlicVX *= -1;
+  }
+  if (garlicY + garlicVY > height || garlicY + garlicVY < height/8) {
+    garlicVY *= random(0.5,1.5);
+    garlicVY *= -1;
+  }
+  garlicX += garlicVX;
+  garlicY += garlicVY;
+  image(garlicImage, garlicX, garlicY, garlicSize, garlicSize);
+}
+
 // drawUI()
 //
 // Draw the UI at the top of the page
@@ -341,6 +393,23 @@ function drawUI() {
   text("Ammo: " + ammo, width/2-width/20, height/20);
   text("Prey Eaten: " + preyEaten, width/2-width/20, height/10);
   text("Sprinting? " + playerSprinting, width-width/3.5, height/20);
+}
+
+// mousePressed()
+//
+// Shoot the blood projectile, click the replay button
+function mousePressed() {
+  if (!gameOver) {
+
+  }
+  if (gameOver) {
+    if (mouseX > width/2-width/8 && mouseX < width/2-width/8+width/3) {
+      if (mouseY > height-height/4 && mouseY < height-height/4+height/10) {
+        gameOver = false;
+        resetGame();
+      }
+    }
+  }
 }
 
 // showGameOver()
@@ -357,4 +426,25 @@ function showGameOver() {
   gameOverText = gameOverText + "before you died."
   // Display it in the centre of the screen
   text(gameOverText, width / 2, height / 2);
+  // Display play again box
+  fill(0,255,0);
+  rect(width/2-width/6, height-height/4, width/3, height/10);
+  fill(0);
+  text("Play Again", width/2, height-height/5);
+}
+
+// resetGame()
+//
+// Reset the game after pressing the Play Again button
+function resetGame() {
+  clear();
+  setupPrey();
+  setupPlayer();
+  setupGarlic();
+  textAlign(LEFT, BASELINE);
+}
+
+// The blood projectile
+class Blood {
+
 }

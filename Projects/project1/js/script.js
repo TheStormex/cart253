@@ -57,12 +57,12 @@ let playerAImage;
 let playerBImage;
 let preyAImage;
 let preyBImage;
-let projectileImage;
 let garlicImage;
-let holyWaterImage;
 
-// Stats for the player's projectile
-let ammo = 3;
+// Time to refresh teleport
+let teleportCooldown = 0;
+// If the player can currently teleport
+let canTeleport = true;
 
 // The rate at which the prey fires the projectile
 let shootRate = 1;
@@ -75,8 +75,8 @@ let playerSpriteChangeSpeed = 500;
 // Garlic location
 let garlicX
 let garlicY
-let garlicVX = 1;
-let garlicVY = 1;
+let garlicVX;
+let garlicVY;
 let garlicSize = 20;
 
 
@@ -87,10 +87,8 @@ function preload() {
   playerAImage = loadImage("assets/images/bat1.png")
   playerBImage = loadImage("assets/images/bat2.png")
   garlicImage = loadImage("assets/images/garlic.png")
-  holyWaterImage = loadImage("assets/images/holyWater.png")
   preyAImage = loadImage("assets/images/person1.png")
   preyBImage = loadImage("assets/images/person2.png")
-  projectileImage = loadImage("assets/images/blood.png")
 }
 
 // setup()
@@ -124,12 +122,16 @@ function setupPrey() {
 function setupPlayer() {
   playerX = 4 * width / 5;
   playerY = height / 2;
-  playerHealth = playerMaxHealth;
+  playerHealth = playerMaxHealth
+  preyEaten = 0;
 }
 
 function setupGarlic() {
-  garlicX = int(random(0, width));
-  garlicY = int(random(height/8, height));
+  garlicVX = 1;
+  garlicVY = 1;
+  garlicSize = 20;
+  garlicX = int(random(0, width-garlicSize));
+  garlicY = int(random(height/8, height-garlicSize));
 }
 
 // draw()
@@ -146,11 +148,13 @@ function draw() {
   if (!gameOver) {
     handleInput();
 
+    teleportTimer();
     movePlayer();
     movePrey();
 
     updateHealth();
     checkEating();
+    checkHit();
 
     drawPrey();
     drawPlayer();
@@ -298,7 +302,23 @@ function checkEating() {
 //
 // Check if player is hitting obstacles like the Holy Water or Garlic
 function checkHit() {
-
+    // Check if the player is hit by the garlic
+    let hitDistance = dist(playerX, playerY, garlicX, garlicY);
+    // Check for overlap
+    if (hitDistance < playerSize + garlicSize) {
+      // Move garlic to prey location
+      garlicX = random(0, width-garlicSize);
+      garlicY = random(height/8, height-garlicSize);
+      // Player loses health
+      playerHealth -= 50
+      // Constrain to the possible range
+      playerHealth = constrain(playerHealth, 0, playerMaxHealth);
+      // Check if the player is dead (0 health)
+      if (playerHealth === 0) {
+        // If so, the game is over
+        gameOver = true;
+    }
+  }
 }
 
 // movePrey()
@@ -330,6 +350,18 @@ function movePrey() {
   }
   else if (preyY > height) {
     preyY = height/8;
+  }
+}
+
+// teleportTimer()
+//
+// If teleport is used up, refresh in 2 seconds
+function teleportTimer() {
+  if (!canTeleport) {
+    if (millis() - teleportCooldown >= 2000) {
+      canTeleport = true;;
+      teleportCooldown = millis();
+    }
   }
 }
 
@@ -367,16 +399,29 @@ function drawPlayer() {
 //
 // Draw the garlic obstacle which bounces on the walls
 function drawGarlic(){
-  if (garlicX + garlicVX > width || garlicX + garlicVX < 0) {
-    garlicVX *= random(0.5,1.5);
+  if (garlicX + garlicSize + garlicVX > width || garlicX + garlicVX < 0) {
+    garlicVX *= random(0.8,1.2);
+    if (garlicVX > 0) {
+      garlicVX = constrain(garlicVX, preyEaten+1, preyEaten+1.5);
+    }
+    if (garlicVX < 0) {
+      garlicVX = constrain(garlicVX, -preyEaten-1.5, -preyEaten-1);
+    }
     garlicVX *= -1;
   }
-  if (garlicY + garlicVY > height || garlicY + garlicVY < height/8) {
-    garlicVY *= random(0.5,1.5);
+  if (garlicY + garlicSize + garlicVY > height || garlicY + garlicVY < height/8) {
+    garlicVY *= random(0.8,1.2);
+    if (garlicVY > 0) {
+      garlicVY = constrain(garlicVY, preyEaten+1, preyEaten+1.5);
+    }
+    if (garlicVY < 0) {
+      garlicVY = constrain(garlicVY, -preyEaten-1.5, -preyEaten-1);
+    }
     garlicVY *= -1;
   }
   garlicX += garlicVX;
   garlicY += garlicVY;
+  garlicSize = preyEaten*2+20;
   image(garlicImage, garlicX, garlicY, garlicSize, garlicSize);
 }
 
@@ -390,7 +435,7 @@ function drawUI() {
   fill(0);
   text("Player Health: " + playerHealth + "/" + playerMaxHealth, width/50, height/20);
   text("Prey Health: " + preyHealth + "/" + preyMaxHealth, width/50, height/10);
-  text("Ammo: " + ammo, width/2-width/20, height/20);
+  text("Teleport: " + canTeleport, width/2-width/20, height/20);
   text("Prey Eaten: " + preyEaten, width/2-width/20, height/10);
   text("Sprinting? " + playerSprinting, width-width/3.5, height/20);
 }
@@ -400,7 +445,12 @@ function drawUI() {
 // Shoot the blood projectile, click the replay button
 function mousePressed() {
   if (!gameOver) {
-
+    if (canTeleport) {
+      canTeleport = false;
+      playerX = mouseX;
+      playerY = mouseY;
+      teleportCooldown = millis();
+    }
   }
   if (gameOver) {
     if (mouseX > width/2-width/8 && mouseX < width/2-width/8+width/3) {
@@ -442,9 +492,4 @@ function resetGame() {
   setupPlayer();
   setupGarlic();
   textAlign(LEFT, BASELINE);
-}
-
-// The blood projectile
-class Blood {
-
 }

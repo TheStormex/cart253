@@ -58,11 +58,20 @@ let playerBImage;
 let preyAImage;
 let preyBImage;
 let garlicImage;
+// Add sound effects
+let audioEating;
+let audioHurt;
+let audioTeleport;
+let audioCanTeleport;
+let audioGameOver;
+let audioEaten;
 
-// Time to refresh teleport
+// Timer for refreshing teleport
 let teleportCooldown = 0;
 // If the player can currently teleport
 let canTeleport = true;
+// The time before teleport refreshes
+let teleportCDTime = 2000;
 
 // The rate at which the prey fires the projectile
 let shootRate = 1;
@@ -330,8 +339,8 @@ function movePrey() {
   preyVY = map(noise(ty),0,1,-preyMaxSpeed,preyMaxSpeed);
 
   // Update prey position based on velocity, velocity increases more preys eaten
-  preyX = preyX + preyVX*preyEaten/6+preyVX;
-  preyY = preyY + preyVY*preyEaten/6+preyVY;
+  preyX = preyX + preyEaten/6+preyVX;
+  preyY = preyY + preyEaten/6+preyVY;
 
   // Change value for noise
   tx += 0.03;
@@ -355,10 +364,11 @@ function movePrey() {
 
 // teleportTimer()
 //
-// If teleport is used up, refresh in 2 seconds
+// If teleport is used up, refresh in 2 seconds at first, faster for each prey we eat
 function teleportTimer() {
+  teleportCDTime = 2000-preyEaten*100;
   if (!canTeleport) {
-    if (millis() - teleportCooldown >= 2000) {
+    if (millis() - teleportCooldown >= teleportCDTime) {
       canTeleport = true;;
       teleportCooldown = millis();
     }
@@ -421,7 +431,7 @@ function drawGarlic(){
   }
   garlicX += garlicVX;
   garlicY += garlicVY;
-  garlicSize = preyEaten*2+20;
+  garlicSize = preyEaten/2+20;
   image(garlicImage, garlicX, garlicY, garlicSize, garlicSize);
 }
 
@@ -442,7 +452,7 @@ function drawUI() {
 
 // mousePressed()
 //
-// Shoot the blood projectile, click the replay button
+// Teleport the player, click the replay button
 function mousePressed() {
   if (!gameOver) {
     if (canTeleport) {

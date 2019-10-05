@@ -2,13 +2,13 @@
 
 /******************************************************
 
-Game - Chaser
-Pippin Barr
+Game - Chaser (Vampire Bat version)
+Pippin Barr (Remixed by Che Tan)
 
-A "simple" game of cat and mouse. The player is a circle and can move with keys,
+A "simple" game of cat and mouse. The player is a vampire bat and can move with keys,
 if they overlap the (randomly moving) prey they "eat it" by sucking out its life
 and adding it to their own. The player "dies" slowly over time so they have to keep
-eating to stay alive.
+eating to stay alive. Also, vampires cannot touch garlic.
 
 Includes: Physics-based movement, keyboard controls, health/stamina,
 random movement, screen wrap.

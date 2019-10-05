@@ -49,6 +49,12 @@ let preyFill = 200;
 let eatHealth = 3;
 // Number of prey eaten during the game (the "score")
 let preyEaten = 0;
+
+// If player is eating the prey
+let isEating = false;
+// Timer for when the eating sound is played
+let eatingTimer = 0;
+
 // Stats for noise
 let tx;
 let ty;
@@ -109,6 +115,7 @@ function setup() {
   setupPrey();
   setupPlayer();
   setupGarlic();
+  setupAudio();
 }
 
 // setupPrey()
@@ -135,12 +142,27 @@ function setupPlayer() {
   preyEaten = 0;
 }
 
+// setupGarlic()
+//
+// Initialises garlic size, speed, location
 function setupGarlic() {
   garlicVX = 1;
   garlicVY = 1;
   garlicSize = 20;
   garlicX = int(random(0, width-garlicSize));
   garlicY = int(random(height/8, height-garlicSize));
+}
+
+// setupAudio()
+//
+// initialises the audio files
+function setupAudio() {
+  audioEating = loadSound('assets/sounds/eating.wav');
+  audioHurt = loadSound('assets/sounds/hurt.wav');
+  audioTeleport = loadSound('assets/sounds/teleport.wav');
+  audioCanTeleport = loadSound('assets/sounds/canTeleport.wav');
+  audioGameOver = loadSound('assets/sounds/gameOver.wav');
+  audioEaten = loadSound('assets/sounds/die.wav');
 }
 
 // draw()
@@ -260,6 +282,8 @@ function updateHealth() {
   if (playerHealth === 0) {
     // If so, the game is over
     gameOver = true;
+    // Play game over sound
+    audioGameOver.play();
   }
 }
 
@@ -271,6 +295,8 @@ function checkEating() {
   let d = dist(playerX, playerY, preyX, preyY);
   // Check if it's an overlap
   if (d < playerSize + preySize) {
+    // Is eating is true since player is eating
+    isEating = true;
     // Increase the player health
     playerHealth = playerHealth + eatHealth;
     // Constrain to the possible range
@@ -287,6 +313,8 @@ function checkEating() {
       preyY = random(0, height);
       // Track how many prey were eaten
       preyEaten = preyEaten + 1;
+      // Play prey dying sound effect
+      audioEaten.play();
       // Increase the speed of the garlic
       if (garlicVX > 0) {
         garlicVX = int(random(preyEaten+1*0.5, preyEaten+1*1.5));
@@ -304,6 +332,19 @@ function checkEating() {
       preyMaxHealth = 100*preyEaten/4+100;
       preyHealth = preyMaxHealth;
     }
+  } else {
+    // Not eating if not touching
+    isEating = false;
+    // Reset eating timer
+    eatingTimer = millis();
+  }
+  // Play the eating sound at intervals if eating
+  if (isEating) {
+    if (millis() - eatingTimer > 200) {
+      // Play the eating sound effect
+      audioEating.play();
+      eatingTimer = millis();
+    }
   }
 }
 
@@ -320,12 +361,16 @@ function checkHit() {
       garlicY = random(height/8, height-garlicSize);
       // Player loses health
       playerHealth -= 50
+      // Play hurt sound
+      audioHurt.play();
       // Constrain to the possible range
       playerHealth = constrain(playerHealth, 0, playerMaxHealth);
       // Check if the player is dead (0 health)
       if (playerHealth === 0) {
         // If so, the game is over
         gameOver = true;
+        // Play game over sound
+        audioGameOver.play();
     }
   }
 }
@@ -371,6 +416,8 @@ function teleportTimer() {
     if (millis() - teleportCooldown >= teleportCDTime) {
       canTeleport = true;;
       teleportCooldown = millis();
+      // Play the can teleport sound
+      audioCanTeleport.play();
     }
   }
 }
@@ -460,6 +507,7 @@ function mousePressed() {
       playerX = mouseX;
       playerY = mouseY;
       teleportCooldown = millis();
+      audioTeleport.play();
     }
   }
   if (gameOver) {

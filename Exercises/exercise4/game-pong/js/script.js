@@ -33,6 +33,9 @@ let ball = {
 let leftRowReturn = 0;
 // When right paddle has 10 points, go to next row
 let rightRowReturn = 0;
+// The left paddle got the most recent point = -1, right: 1. For starting in the
+// Recently gotten point's direction
+let recentPoint = 1;
 
 // PADDLES
 
@@ -202,11 +205,13 @@ function ballIsOutOfBounds() {
   // Check for ball going off the sides
   if (ball.x < 0) {
     rightPaddle.score++;
+    recentPoint = 1;
     return true;
 
   }
   if (ball.x > width) {
     leftPaddle.score++;
+    recentPoint = -1;
     return true;
   }
   else {
@@ -305,8 +310,12 @@ function resetBall() {
   // Initialise the ball's position and velocity
   ball.x = width / 2;
   ball.y = height / 2;
-  ball.vx = ball.speed;
-  ball.vy = ball.speed;
+  ball.vx = ball.speed*recentPoint;
+  if (random(-1,1) > 0) {
+    ball.vy = -1*random(ball.speed*0.5, ball.speed*1.5);
+  } else if (random(-1,1) < 0) {
+    ball.vy = random(ball.speed*0.5, ball.speed*1.5);
+  }
 }
 
 // displayStartMessage()

@@ -1,7 +1,7 @@
 "use strict";
 
 // Pong
-// by Pippin Barr
+// by Pippin Barr (remixed by Che Tan)
 //
 // A "simple" implementation of Pong with no scoring system
 // just the ability to play the game with the keyboard.
@@ -32,7 +32,7 @@ let ball = {
 // PADDLES
 
 // Basic definition of a left paddle object with its key properties of
-// position, size, velocity, and speed
+// position, size, velocity, score, and speed
 let leftPaddle = {
   x: 0,
   y: 0,
@@ -41,13 +41,14 @@ let leftPaddle = {
   vy: 0,
   speed: 5,
   upKey: 87,
-  downKey: 83
+  downKey: 83,
+  score: 0
 }
 
 // RIGHT PADDLE
 
 // Basic definition of a left paddle object with its key properties of
-// position, size, velocity, and speed
+// position, size, velocity, score, and speed
 let rightPaddle = {
   x: 0,
   y: 0,
@@ -56,7 +57,8 @@ let rightPaddle = {
   vy: 0,
   speed: 5,
   upKey: 38,
-  downKey: 40
+  downKey: 40,
+  score: 0
 }
 
 // A variable to hold the beep sound we will play on bouncing
@@ -117,6 +119,7 @@ function draw() {
     checkBallWallCollision();
     checkBallPaddleCollision(leftPaddle);
     checkBallPaddleCollision(rightPaddle);
+    displayUI();
 
     // Check if the ball went out of bounds and respond if so
     // (Note how we can use a function that returns a truth value
@@ -157,6 +160,7 @@ function handleInput(paddle) {
   }
   else {
     // Otherwise stop moving
+    print("yes");
     paddle.vy = 0;
   }
 }
@@ -166,7 +170,14 @@ function handleInput(paddle) {
 // Sets the positions of the paddles and ball based on their velocities
 function updatePaddle(paddle) {
   // Update the paddle position based on its velocity
+  // Prevent paddles from going out of the screen
   paddle.y += paddle.vy;
+  if (paddle.y - paddle.h/2 - paddle.speed < 0) {
+    paddle.y = paddle.h/2;
+  }
+  if (paddle.y + paddle.h/2 + paddle.speed > height) {
+    paddle.y = height - paddle.h/2;
+  }
 }
 
 // updateBall()
@@ -184,7 +195,13 @@ function updateBall() {
 // Returns true if so, false otherwise
 function ballIsOutOfBounds() {
   // Check for ball going off the sides
-  if (ball.x < 0 || ball.x > width) {
+  if (ball.x < 0) {
+    rightPaddle.score++;
+    return true;
+
+  }
+  if (ball.x > width) {
+    leftPaddle.score++;
     return true;
   }
   else {
@@ -256,6 +273,18 @@ function displayBall() {
   rect(ball.x, ball.y, ball.size, ball.size);
 }
 
+// displayUI()
+//
+// Draws the score
+function displayUI() {
+  push();
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  text(leftPaddle.score, width / 2 - width / 10, height / 2 - height / 3);
+  text(rightPaddle.score, width / 2 + width / 10, height / 2 - height / 3);
+  pop();
+}
+
 // resetBall()
 //
 // Sets the starting position and velocity of the ball
@@ -274,7 +303,7 @@ function displayStartMessage() {
   push();
   textAlign(CENTER, CENTER);
   textSize(32);
-  text("CLICK TO START", width / 2, height / 2);
+  text("CLICK TO START", width / 2, height / 2 - height / 3);
   pop();
 }
 

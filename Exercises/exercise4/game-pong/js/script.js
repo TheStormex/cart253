@@ -29,6 +29,11 @@ let ball = {
   speed: 5
 }
 
+// When left paddle has 10 points, go to next row
+let leftRowReturn = 0;
+// When right paddle has 10 points, go to next row
+let rightRowReturn = 0;
+
 // PADDLES
 
 // Basic definition of a left paddle object with its key properties of
@@ -275,14 +280,22 @@ function displayBall() {
 
 // displayUI()
 //
-// Draws the score
+// Draws the score without numbers
 function displayUI() {
-  push();
-  textAlign(CENTER, CENTER);
-  textSize(32);
-  text(leftPaddle.score, width / 2 - width / 10, height / 2 - height / 3);
-  text(rightPaddle.score, width / 2 + width / 10, height / 2 - height / 3);
-  pop();
+  for (var i = 0; i < leftPaddle.score; i++) {
+    leftRowReturn = i;
+    if (leftRowReturn/10 >= 1) {
+      leftRowReturn -= 10*(floor(i/10));
+    }
+    rect(width/3-width/30*(leftRowReturn-1), height/8+(height/15*floor(i/10)), width/50, height/20);
+  }
+  for (var i = 0; i < rightPaddle.score; i++) {
+    rightRowReturn = i;
+    if (rightRowReturn/10 >= 1) {
+      rightRowReturn -= 10*(floor(i/10));
+    }
+    rect(width/(3/2)+width/30*(rightRowReturn-1), height/8+(height/15*floor(i/10)), width/50, height/20);
+  }
 }
 
 // resetBall()

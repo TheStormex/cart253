@@ -81,6 +81,19 @@ let rightPaddle = {
   winMessage: "Right Player Wins!"
 }
 
+// Enric's code
+let btn10game = {
+  x : 0,
+  y: 0,
+  w: 100,
+  h: 100,
+  checkBounds : function(clickX, clickY) {
+    let horizontalCheck = clickX > x && clickX < x + w;
+    let verticalCheck = clickY > y && clickY < y + h;
+    return horizontalCheck && verticalCheck;
+  }
+}
+
 // A variable to hold the beep sound we will play on bouncing
 let beepSFX;
 
@@ -261,10 +274,10 @@ function checkBallPaddleCollision(paddle) {
 
   // We will calculate the top, bottom, left, and right of the
   // paddle and the ball to make our conditionals easier to read...
-  let ballTop = ball.y - ball.size / 2;
-  let ballBottom = ball.y + ball.size / 2;
-  let ballLeft = ball.x - ball.size / 2;
-  let ballRight = ball.x + ball.size / 2;
+  let ballTop = ball.y - ball.size / 2 + ball.vy ;
+  let ballBottom = ball.y + ball.size / 2 + ball.vy;
+  let ballLeft = ball.x - ball.size / 2 + ball.vx;
+  let ballRight = ball.x + ball.size / 2 + ball.vx;
 
   let paddleTop = paddle.y - paddle.h / 2;
   let paddleBottom = paddle.y + paddle.h / 2;
@@ -321,7 +334,12 @@ function displayUI() {
   fill(0, 0, 100);
   for (var i = 0; i < leftPaddle.score; i++) {
     leftRowReturn = i;
-    if (leftRowReturn/10 >= 1) {
+
+    // Enric's code
+    // let column = floor(leftRowReturn % 10);
+    // let row = floor(i/10);
+    // rect(width/3-width/30*(column-1), height/8+(height/15*row), width/50, height/20);
+  if (leftRowReturn/10 >= 1) {
       leftRowReturn -= 10*(floor(i/10));
     }
     rect(width/3-width/30*(leftRowReturn-1), height/8+(height/15*floor(i/10)), width/50, height/20);
@@ -375,7 +393,12 @@ function displayStartMessage() {
 // Which will help us be allowed to play audio in the browser
 function mousePressed() {
   if (playing === 0) {
-    print("yes");
+    // Enric's  code
+    // if(btn10game.checkBounds(mouseX, mouseY)){
+    //  winScore = 10;
+    //  playing = 1;
+    // }
+
     if (mouseX > width/2-width/4-width/20 && mouseX < width/2-width/4 + width/10 - width/20 && mouseY > height/2+height/3 - height/10 && mouseY < height/2+height/3 + height/5 - height/10) {
       winScore = 10;
       playing = 1;
@@ -427,4 +450,5 @@ function resetGame() {
   leftPaddle.color = 1;
   rightPaddle.score = 0;
   rightPaddle.color = 50;
+  // btn10game.x = width/4;
 }

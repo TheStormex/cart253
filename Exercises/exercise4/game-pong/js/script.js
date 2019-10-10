@@ -29,6 +29,8 @@ let ball = {
   speed: 5
 }
 
+let ballColor = 1;
+
 // When left paddle has 10 points, go to next row
 let leftRowReturn = 0;
 // When right paddle has 10 points, go to next row
@@ -50,7 +52,8 @@ let leftPaddle = {
   speed: 5,
   upKey: 87,
   downKey: 83,
-  score: 0
+  score: 0,
+  color: 1
 }
 
 // RIGHT PADDLE
@@ -66,7 +69,8 @@ let rightPaddle = {
   speed: 5,
   upKey: 38,
   downKey: 40,
-  score: 0
+  score: 0,
+  color: 50
 }
 
 // A variable to hold the beep sound we will play on bouncing
@@ -93,6 +97,8 @@ function setup() {
 
   setupPaddles();
   resetBall();
+  // Set color mode to allow cycling thorugh spectrum
+  colorMode(HSB, 100);
 }
 
 // setupPaddles()
@@ -113,8 +119,8 @@ function setupPaddles() {
 // Calls the appropriate functions to run the game
 // See how tidy it looks?!
 function draw() {
-  // Fill the background
-  background(bgColor);
+  // Fill the background slightly to allow tail effect
+  background(bgColor, 5);
 
   if (playing) {
     // If the game is in play, we handle input and move the elements around
@@ -168,7 +174,6 @@ function handleInput(paddle) {
   }
   else {
     // Otherwise stop moving
-    print("yes");
     paddle.vy = 0;
   }
 }
@@ -260,6 +265,7 @@ function checkBallPaddleCollision(paddle) {
       // Then the ball is touching the paddle
       // Reverse its vx so it starts travelling in the opposite direction
       ball.vx = -ball.vx;
+      paddle.color = random(1, 100);
       // Play our bouncing sound effect by rewinding and then playing
       beepSFX.currentTime = 0;
       beepSFX.play();
@@ -272,7 +278,10 @@ function checkBallPaddleCollision(paddle) {
 // Draws the specified paddle
 function displayPaddle(paddle) {
   // Draw the paddles
+  push();
+  fill(paddle.color, 100, 100);
   rect(paddle.x, paddle.y, paddle.w, paddle.h);
+  pop();
 }
 
 // displayBall()
@@ -280,13 +289,23 @@ function displayPaddle(paddle) {
 // Draws the ball on screen as a square
 function displayBall() {
   // Draw the ball
-  rect(ball.x, ball.y, ball.size, ball.size);
+  push();
+  if (ballColor < 100) {
+    ballColor++;
+  } else {
+    ballColor = 1;
+  }
+  fill(ballColor, 100, 100);
+  ellipse(ball.x, ball.y, ball.size);
+  pop();
 }
 
 // displayUI()
 //
 // Draws the score without numbers
 function displayUI() {
+  push();
+  fill(0, 0, 100);
   for (var i = 0; i < leftPaddle.score; i++) {
     leftRowReturn = i;
     if (leftRowReturn/10 >= 1) {
@@ -301,6 +320,7 @@ function displayUI() {
     }
     rect(width/(3/2)+width/30*(rightRowReturn-1), height/8+(height/15*floor(i/10)), width/50, height/20);
   }
+  pop();
 }
 
 // resetBall()

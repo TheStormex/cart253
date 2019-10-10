@@ -9,12 +9,15 @@
 // Up and down keys control the right hand paddle, W and S keys control
 // the left hand paddle
 
-// Whether the game has started
-let playing = false;
+// Game state: 0 = starting sreen, 1 = playing, 2 = game over.
+let playing = 0;
 
 // Game colors (using hexadecimal)
 let bgColor = 0;
 let fgColor = 255;
+
+// How many points to win
+let winScore = 10;
 
 // BALL
 
@@ -39,6 +42,9 @@ let rightRowReturn = 0;
 // Recently gotten point's direction
 let recentPoint = 1;
 
+// Variable for the coin flip random
+let fiftyFifty = 0;
+
 // PADDLES
 
 // Basic definition of a left paddle object with its key properties of
@@ -53,7 +59,8 @@ let leftPaddle = {
   upKey: 87,
   downKey: 83,
   score: 0,
-  color: 1
+  color: 1,
+  winMessage: "Left Player Wins!"
 }
 
 // RIGHT PADDLE
@@ -70,7 +77,8 @@ let rightPaddle = {
   upKey: 38,
   downKey: 40,
   score: 0,
-  color: 50
+  color: 50,
+  winMessage: "Right Player Wins!"
 }
 
 // A variable to hold the beep sound we will play on bouncing
@@ -93,10 +101,7 @@ function setup() {
   createCanvas(640, 480);
   rectMode(CENTER);
   noStroke();
-  fill(fgColor);
-
-  setupPaddles();
-  resetBall();
+  resetGame();
   // Set color mode to allow cycling thorugh spectrum
   colorMode(HSB, 100);
 }
@@ -122,13 +127,15 @@ function draw() {
   // Fill the background slightly to allow tail effect
   background(bgColor, 5);
 
-  if (playing) {
+  if (playing === 1) {
     // If the game is in play, we handle input and move the elements around
     handleInput(leftPaddle);
     handleInput(rightPaddle);
     updatePaddle(leftPaddle);
     updatePaddle(rightPaddle);
     updateBall();
+    playerWin(leftPaddle);
+    playerWin(rightPaddle);
 
     checkBallWallCollision();
     checkBallPaddleCollision(leftPaddle);
@@ -145,9 +152,15 @@ function draw() {
       // the ball went off...
     }
   }
-  else {
-    // Otherwise we display the message to start the game
+  if (playing === 0) {
+    // Starting screen, display the message to start the game
     displayStartMessage();
+  }
+
+  if (playing === 2) {
+    // Game over screen
+    playerWin(leftPaddle);
+    playerWin(rightPaddle);
   }
 
   // We always display the paddles and ball so it looks like Pong!
@@ -331,9 +344,10 @@ function resetBall() {
   ball.x = width / 2;
   ball.y = height / 2;
   ball.vx = ball.speed*recentPoint;
-  if (random(-1,1) > 0) {
+  fiftyFifty = random(0,1);
+  if (fiftyFifty >= 0.5) {
     ball.vy = -1*random(ball.speed*0.5, ball.speed*1.5);
-  } else if (random(-1,1) < 0) {
+  } else if (fiftyFifty < 0.5) {
     ball.vy = random(ball.speed*0.5, ball.speed*1.5);
   }
 }
@@ -345,7 +359,13 @@ function displayStartMessage() {
   push();
   textAlign(CENTER, CENTER);
   textSize(32);
-  text("CLICK TO START", width / 2, height / 2 - height / 3);
+  text("CLICK ON WINNING SCORE TO START", width / 2, height / 2 - height / 3);
+  for (var i = 0; i < 3; i++) {
+    fill(255);
+    rect((width/2-width/4)+width/4*i, height/2+height/3, width/10, height/5);
+    fill(0);
+    text((i+1)*10, width/2-width/4+width/4*i, height/2+height/3);
+  }
   pop();
 }
 
@@ -354,5 +374,57 @@ function displayStartMessage() {
 // Here to require a click to start playing the game
 // Which will help us be allowed to play audio in the browser
 function mousePressed() {
-  playing = true;
+  if (playing === 0) {
+    print("yes");
+    if (mouseX > width/2-width/4-width/20 && mouseX < width/2-width/4 + width/10 - width/20 && mouseY > height/2+height/3 - height/10 && mouseY < height/2+height/3 + height/5 - height/10) {
+      winScore = 10;
+      playing = 1;
+    }
+    if (mouseX > width/2-width/4-width/20+width/4 && mouseX < width/2-width/4 + width/10 - width/20 + width/4  && mouseY > height/2+height/3 - height/10 && mouseY < height/2+height/3 + height/5 - height/10) {
+      winScore = 20;
+      playing = 1;
+    }
+    if (mouseX > width/2-width/4-width/20+width/2 && mouseX < width/2-width/4 + width/10 - width/20 + width/2 && mouseY > height/2+height/3 - height/10 && mouseY < height/2+height/3 + height/5 - height/10) {
+      winScore = 30;
+      playing = 1;
+    }
+  }
+   if (playing === 2) {
+    resetGame();
+    playing = 0;
+  }
+}
+
+// playerWin
+//
+// Check if a player has won the game
+function playerWin(paddle) {
+  if (paddle.score >= winScore) {
+    playing = 2;
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    text(paddle.winMessage, width / 2, height / 2 - height / 3);
+    pop();
+  }
+}
+
+// resetGame()
+//
+// Resets the Game
+function resetGame() {
+  fill(fgColor);
+  setupPaddles();
+  // The ball starts moving in a random direction
+  fiftyFifty = random(0,1);
+  if (fiftyFifty >= 0.5) {
+    ball.vy = -1*random(ball.speed*0.5, ball.speed*1.5);
+  } else if (fiftyFifty < 0.5) {
+    ball.vy = random(ball.speed*0.5, ball.speed*1.5);
+  }
+  resetBall();
+  leftPaddle.score = 0;
+  leftPaddle.color = 1;
+  rightPaddle.score = 0;
+  rightPaddle.color = 50;
 }

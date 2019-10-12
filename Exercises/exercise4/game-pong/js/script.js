@@ -19,6 +19,9 @@ let fgColor = 255;
 // How many points to win
 let winScore = 10;
 
+// Which bounce sound to use
+let whichSound = 0;
+
 // BALL
 
 // A ball object with the properties of
@@ -94,12 +97,17 @@ let btn10game = {
   }
 }
 
-// A variable to hold the beep sound we will play on bouncing
+// A variable to hold the beep sounds we will play on bouncing
 let beepSFX;
+let audioHit1;
+let audioHit2;
+let audioHit3;
+let audioHit4;
+let audioHit5;
 
 // preload()
 //
-// Loads the beep audio for the sound of bouncing
+// Loads the beep audio for the sound of scoring
 function preload() {
   beepSFX = new Audio("assets/sounds/beep.wav");
 }
@@ -117,6 +125,12 @@ function setup() {
   resetGame();
   // Set color mode to allow cycling thorugh spectrum
   colorMode(HSB, 100);
+  // Set up the bounce sounds
+  audioHit1 = loadSound('assets/sounds/pong-1.wav');
+  audioHit2 = loadSound('assets/sounds/pong-2.wav');
+  audioHit3 = loadSound('assets/sounds/pong-3.wav');
+  audioHit4 = loadSound('assets/sounds/pong-4.wav');
+  audioHit5 = loadSound('assets/sounds/pong-5.wav');
 }
 
 // setupPaddles()
@@ -237,13 +251,21 @@ function ballIsOutOfBounds() {
   if (ball.x < 0) {
     rightPaddle.score++;
     recentPoint = 1;
+    // Play our score sound effect by rewinding and then playing
+    beepSFX.currentTime = 0;
+    beepSFX.play();
     return true;
+
 
   }
   if (ball.x > width) {
     leftPaddle.score++;
     recentPoint = -1;
+    // Play our score sound effect by rewinding and then playing
+    beepSFX.currentTime = 0;
+    beepSFX.play();
     return true;
+
   }
   else {
     return false;
@@ -260,9 +282,8 @@ function checkBallWallCollision() {
   if (ball.y < 0 || ball.y > height) {
     // It hit so reverse velocity
     ball.vy = -ball.vy;
-    // Play our bouncing sound effect by rewinding and then playing
-    beepSFX.currentTime = 0;
-    beepSFX.play();
+    // Play a random bounce sound effect
+    randomSound()
   }
 }
 
@@ -292,9 +313,8 @@ function checkBallPaddleCollision(paddle) {
       // Reverse its vx so it starts travelling in the opposite direction
       ball.vx = -ball.vx;
       paddle.color = random(1, 100);
-      // Play our bouncing sound effect by rewinding and then playing
-      beepSFX.currentTime = 0;
-      beepSFX.play();
+      // Play a random bounce sound effect
+      randomSound()
     }
   }
 }
@@ -429,6 +449,32 @@ function playerWin(paddle) {
     textSize(32);
     text(paddle.winMessage, width / 2, height / 2 - height / 3);
     pop();
+  }
+}
+
+// randomSound()
+//
+//Play one of 5 sounds
+function randomSound() {
+  whichSound = floor(random(0, 5));
+  switch (whichSound) {
+    case 0:
+      audioHit1.play();
+      break;
+    case 1:
+      audioHit2.play();
+      break;
+    case 2:
+      audioHit3.play();
+      break;
+    case 3:
+      audioHit4.play();
+      break;
+    case 4:
+      audioHit5.play();
+      break;
+    default:
+      beepSFX.play();
   }
 }
 

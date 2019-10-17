@@ -31,6 +31,8 @@ class Predator {
     this.downKey = downKey;
     this.leftKey = leftKey;
     this.rightKey = rightKey;
+    // How many preys eaten
+    this.preyEaten = 0;
   }
 
   // handleInput
@@ -112,8 +114,9 @@ class Predator {
       this.health = constrain(this.health, 0, this.maxHealth);
       // Decrease prey health by the same amount
       prey.health -= this.healthGainPerEat;
-      // Check if the prey died and reset it if so
+      // Check if the prey died and reset it if so and add 1 prey eaten
       if (prey.health < 0) {
+        this.preyEaten += 1;
         prey.reset();
       }
     }
@@ -123,12 +126,19 @@ class Predator {
   //
   // Draw the predator as an ellipse on the canvas
   // with a radius the same size as its current health.
+  // Draw the anount of prey eaten in the middle
   display() {
     push();
     noStroke();
     fill(this.fillColor);
     this.radius = this.health;
     ellipse(this.x, this.y, this.radius * 2);
+    pop();
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(this.radius);
+    fill(0);
+    text(this.preyEaten, this.x, this.y);
     pop();
   }
 }

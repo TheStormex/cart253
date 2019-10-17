@@ -151,9 +151,9 @@ class Predator {
       pop();
       push();
       textAlign(CENTER, CENTER);
-      textSize(this.radius);
-      fill(0);
-      text(this.preyEaten, this.x, this.y);
+      textSize(50);
+      fill(random(0, 255), random(0, 255), random(0, 255));
+      text(this.preyEaten, this.x, this.y-height/20);
       pop();
     }
   }

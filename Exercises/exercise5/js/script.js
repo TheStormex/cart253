@@ -6,8 +6,8 @@
 // The predator loses health over time, so must keep eating to survive.
 
 // Our predators
-let tiger;
-let snowLeopard;
+let tiger; // control is WASD and Spacebar for sprint
+let snowLeopard; // control is Arrow keys and numpad 0
 
 // The three prey
 let antelope;
@@ -21,8 +21,8 @@ let bee;
 // One
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  tiger = new Predator(width/2-width/3, height/2, 5, color(255, 0, 0), 40, 87, 83, 65, 68);
-  snowLeopard = new Predator(width/2+width/3, height/2, 5, color(0, 0, 255), 40, 38, 40, 37, 39);
+  tiger = new Predator(width/2-width/3, height/2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32);
+  snowLeopard = new Predator(width/2+width/3, height/2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96);
   antelope = new Prey(100, 100, 10, color(255, 100, 10), 50);
   zebra = new Prey(100, 100, 8, color(255, 255, 255), 60);
   bee = new Prey(100, 100, 20, color(255, 255, 0), 10);

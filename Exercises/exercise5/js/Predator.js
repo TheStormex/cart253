@@ -10,7 +10,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius, upKey, downKey, leftKey, rightKey) {
+  constructor(x, y, speed, fillColor, radius, upKey, downKey, leftKey, rightKey, sprintKey) {
     // Position
     this.x = x;
     this.y = y;
@@ -31,6 +31,7 @@ class Predator {
     this.downKey = downKey;
     this.leftKey = leftKey;
     this.rightKey = rightKey;
+    this.sprintKey = sprintKey;
     // How many preys eaten
     this.preyEaten = 0;
   }
@@ -40,6 +41,8 @@ class Predator {
   // Checks if an arrow key is pressed and sets the predator's
   // velocity appropriately.
   handleInput() {
+    // Set health lost per move back to 0.1 if we were sprinting before
+    this.healthLossPerMove = 0.1;
     // Horizontal movement
     if (keyIsDown(this.leftKey)) {
       this.vx = -this.speed;
@@ -59,6 +62,12 @@ class Predator {
     }
     else {
       this.vy = 0;
+    }
+    // Add sprint bonus speed if sprinting and lose health faster
+    if (keyIsDown(this.sprintKey)) {
+      this.vx *= 2;
+      this.vy *= 2;
+      this.healthLossPerMove = 0.2;
     }
   }
 

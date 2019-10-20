@@ -10,7 +10,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius) {
+  constructor(x, y, speed, fillColor, radius, upKey, downKey, leftKey, rightKey, sprintKey, image) {
     // Position
     this.x = x;
     this.y = y;
@@ -27,10 +27,15 @@ class Predator {
     this.fillColor = fillColor;
     this.radius = this.health; // Radius is defined in terms of health
     // Input properties
-    this.upKey = UP_ARROW;
-    this.downKey = DOWN_ARROW;
-    this.leftKey = LEFT_ARROW;
-    this.rightKey = RIGHT_ARROW;
+    this.upKey = upKey;
+    this.downKey = downKey;
+    this.leftKey = leftKey;
+    this.rightKey = rightKey;
+    this.sprintKey = sprintKey;
+    // How many preys eaten
+    this.preyEaten = 0;
+    // The image of the predator
+    this.image = image;
   }
 
   // handleInput
@@ -38,6 +43,8 @@ class Predator {
   // Checks if an arrow key is pressed and sets the predator's
   // velocity appropriately.
   handleInput() {
+    // Set health lost per move back to 0.1 if we were sprinting before
+    this.healthLossPerMove = 0.1;
     // Horizontal movement
     if (keyIsDown(this.leftKey)) {
       this.vx = -this.speed;
@@ -57,6 +64,12 @@ class Predator {
     }
     else {
       this.vy = 0;
+    }
+    // Add sprint bonus speed if sprinting and lose health faster
+    if (keyIsDown(this.sprintKey)) {
+      this.vx *= 2;
+      this.vy *= 2;
+      this.healthLossPerMove = 0.2;
     }
   }
 
@@ -112,8 +125,9 @@ class Predator {
       this.health = constrain(this.health, 0, this.maxHealth);
       // Decrease prey health by the same amount
       prey.health -= this.healthGainPerEat;
-      // Check if the prey died and reset it if so
+      // Check if the prey died and reset it if so and add 1 prey eaten
       if (prey.health < 0) {
+        this.preyEaten += 1;
         prey.reset();
       }
     }
@@ -123,12 +137,24 @@ class Predator {
   //
   // Draw the predator as an ellipse on the canvas
   // with a radius the same size as its current health.
+  // Draw the image in the ellipse
+  // Draw the anount of prey eaten in the middle
+  // Draw only if alive
   display() {
-    push();
-    noStroke();
-    fill(this.fillColor);
-    this.radius = this.health;
-    ellipse(this.x, this.y, this.radius * 2);
-    pop();
+    if (this.health > 0) {
+      push();
+      noStroke();
+      fill(this.fillColor);
+      this.radius = this.health;
+      ellipse(this.x, this.y, this.radius * 2);
+      image(this.image, this.x, this.y, this.radius, this.radius);
+      pop();
+      push();
+      textAlign(CENTER, CENTER);
+      textSize(50);
+      fill(random(0, 255), random(0, 255), random(0, 255));
+      text(this.preyEaten, this.x, this.y-height/20);
+      pop();
+    }
   }
 }

@@ -10,7 +10,7 @@ class Prey {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius) {
+  constructor(x, y, speed, fillColor, radius, image) {
     // Position
     this.x = x;
     this.y = y;
@@ -27,6 +27,8 @@ class Prey {
     // Display properties
     this.fillColor = fillColor;
     this.radius = this.health;
+    // The prey's image
+    this.image = image;
   }
 
   // move
@@ -72,13 +74,18 @@ class Prey {
   //
   // Draw the prey as an ellipse on the canvas
   // with a radius the same size as its current health.
+  // Draw the image in the ellipse
+  // Draw only if alive
   display() {
-    push();
-    noStroke();
-    fill(this.fillColor);
-    this.radius = this.health;
-    ellipse(this.x, this.y, this.radius * 2);
-    pop();
+    if (this.health > 0) {
+      push();
+      noStroke();
+      fill(this.fillColor);
+      this.radius = this.health;
+      ellipse(this.x, this.y, this.radius * 2);
+      image(this.image, this.x, this.y, this.radius, this.radius);
+      pop();
+    }
   }
 
   // reset

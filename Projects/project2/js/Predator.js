@@ -140,6 +140,7 @@ class Predator {
   // Draw the image in the ellipse
   // Draw the anount of prey eaten in the middle
   // Draw only if alive
+  // if dead, go to game over screen
   display() {
     if (this.health > 0) {
       push();
@@ -155,6 +156,8 @@ class Predator {
       fill(random(0, 255), random(0, 255), random(0, 255));
       text(this.preyEaten, this.x, this.y-height/20);
       pop();
+    } else {
+      whichScreen = 3;
     }
   }
 }

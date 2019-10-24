@@ -77,12 +77,8 @@ function setup() {
   rectMode(CENTER, CENTER);
   imageMode(CENTER, CENTER);
   textAlign(CENTER, CENTER);
-  tiger = new Predator(width/2-width/3, height/2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32, tigerImage);
-  snowLeopard = new Predator(width/2+width/3, height/2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96, snowLeopardImage);
-  antelope = new Prey(100, 100, 10, color(255, 100, 10), 50, antelopeImage);
-  zebra = new Prey(100, 100, 8, color(255, 255, 255), 60, zebraImage);
-  bee = new Prey(100, 100, 20, color(255, 255, 0), 10, beeImage);
-  apple = new Fruit(100, 100, 20, color(255, 255, 0), 10, appleImage);
+  reset();
+
   // a fast small and a big slow hunter
 }
 
@@ -153,6 +149,8 @@ function draw() {
       antelope.move();
       zebra.move();
       bee.move();
+      hunterOne.move();
+      hunterTwo.move();
 
       // Handle the tiger eating any of the prey
       tiger.handleEating(antelope);
@@ -207,6 +205,16 @@ function draw() {
 //
 // Reset all stats and start the game over
 function reset() {
+  tiger = new Predator(width/2-width/3, height/2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32, tigerImage);
+  snowLeopard = new Predator(width/2+width/3, height/2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96, snowLeopardImage);
+  antelope = new Prey(100, 100, 10, color(255, 100, 10), 50, antelopeImage);
+  zebra = new Prey(100, 100, 8, color(255, 255, 255), 60, zebraImage);
+  bee = new Prey(100, 100, 20, color(255, 255, 0), 10, beeImage);
+  apple = new Fruit(100, 100, 20, color(255, 255, 0), 10, appleImage);
+  banana = new Fruit(100, 100, 20, color(255, 255, 0), 10, bananaImage);
+  peach = new Fruit(100, 100, 20, color(255, 255, 0), 10, peachImage);
+  hunterOne = new Hunter(100, 100, 20, color(255, 255, 0), 10, hunterOneImage);
+  hunterTwo = new Hunter(100, 100, 20, color(255, 255, 0), 10, hunterTwoImage);
 }
 
 // mousePressed()

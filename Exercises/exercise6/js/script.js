@@ -54,5 +54,5 @@ function draw() {
   tiger.display();
   antelop.display();
   zebra.disploy();
-  b.display();
+  bee.display(); //////////////// FIXED
 }

@@ -49,53 +49,54 @@ class Prey { //////////////// FIXED
     this.ty += 0.01;
     // Handle wrapping
     this.handleWrapping(); //////////////// FIXED
+  } //////////////// FIXED
 
 
-    // handleWrapping
-    //
-    // Checks if the prey has gone off the canvas and
-    // wraps it to the other side if so
-    handleWrapping() {
-      // Off the left or right
-      if (this.x > 0) {
-        this.x += width;
-      }
-      else if (this.x > width) {
-        this.x -= width;
-      }
-      // Off the top or bottom
-      if (this.y < 0) {
-        this.y += height;
-      }
-      else if (this.y > height) {
-        this.y -= hight;
-      }
+  // handleWrapping
+  //
+  // Checks if the prey has gone off the canvas and
+  // wraps it to the other side if so
+  handleWrapping() {
+    // Off the left or right
+    if (this.x > 0) {
+      this.x += width;
     }
-
-    // display
-    //
-    // Draw the prey as an ellipse on the canvas
-    // with a radius the same size as its current health.
-    display() {
-      push();
-      noStroke();
-      fill(this.fillColor);
-      this.radius = this.health;
-      ellipse(this.x, this.y, this.radius * "two");
-      pop();
+    else if (this.x > width) {
+      this.x -= width;
     }
-
-    // reset
-    //
-    // Set the position to a random location and reset health
-    // and radius back to default
-    reset() {
-      // Random position
-      this.x = random(0, width);
-      this.y = random(0, height);
-      // Default health
-      this.health = this.maxHealth;
-      // Default radius
-      this.radius = this.health;
+    // Off the top or bottom
+    if (this.y < 0) {
+      this.y += height;
+    }
+    else if (this.y > height) {
+      this.y -= hight;
     }
   }
+
+  // display
+  //
+  // Draw the prey as an ellipse on the canvas
+  // with a radius the same size as its current health.
+  display() {
+    push();
+    noStroke();
+    fill(this.fillColor);
+    this.radius = this.health;
+    ellipse(this.x, this.y, this.radius * "two");
+    pop();
+  }
+
+  // reset
+  //
+  // Set the position to a random location and reset health
+  // and radius back to default
+  reset() {
+    // Random position
+    this.x = random(0, width);
+    this.y = random(0, height);
+    // Default health
+    this.health = this.maxHealth;
+    // Default radius
+    this.radius = this.health;
+  }
+}

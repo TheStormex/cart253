@@ -45,6 +45,7 @@ function draw() {
   tiger.move();
   antelope.move();
   zebra.move();
+  bee.move(); //////////////// FIXED
 
   // Handle the tiger eating any of the prey
   tiger.handleEating(antelope);

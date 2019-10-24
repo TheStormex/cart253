@@ -29,8 +29,6 @@ class Prey {
     this.radius = this.health;
     // The prey's image
     this.image = image;
-    // Add 1 to the list of preys
-    preyArray ++;
   }
 
   // move

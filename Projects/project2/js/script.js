@@ -13,20 +13,14 @@ let tigerImage;
 let snowLeopard; // control is Arrow keys and numpad 0
 let snowLeopardImage;
 
-// The three prey
-let antelope;
+// The three prey images
 let antelopeImage;
-let zebra;
 let zebraImage;
-let bee;
 let beeImage;
 
 // The hunters
-let hunterOne;
 let hunterOneImage;
-let hunterTwo;
 let hunterTwoImage;
-let bullet;
 let bulletImage;
 
 // The fruits
@@ -37,11 +31,17 @@ let peachImage;
 let banana;
 let bananaImage;
 
-// Arrays
-let hunterArray = [];
-let fruitArray = [];
-let bulletArray = [];
-let preyArray = [];
+// How many characters of each type is on the screen
+let hunterNum = 0;
+let fruitNum = 0;
+let bulletNum = 0;
+let preyNum = 0;
+
+// The character objects arrays
+let hunterList = [];
+let fruitList = [];
+let bulletList = [];
+let preyList = [];
 
 // Background iamge
 let backgroundImage;
@@ -146,26 +146,22 @@ function draw() {
       // Move all the "animals"
       tiger.move();
       snowLeopard.move();
-      antelope.move();
-      zebra.move();
-      bee.move();
-      hunterOne.move();
-      hunterTwo.move();
+      for (var i = 0; i < preyList.length; i++) {
+        preyList[i].move();
+      }
 
-      // Handle the tiger eating any of the prey
-      tiger.handleEating(antelope);
-      tiger.handleEating(zebra);
-      tiger.handleEating(bee);
-      snowLeopard.handleEating(antelope);
-      snowLeopard.handleEating(zebra);
-      snowLeopard.handleEating(bee);
+      // Handle the predators eating any of the prey
+      for (var i = 0; i < preyList.length; i++) {
+        tiger.handleEating(preyList[i]);
+        snowLeopard.handleEating(preyList[i]);
+      }
 
       // Display all the "animals"
       tiger.display();
       snowLeopard.display();
-      antelope.display();
-      zebra.display();
-      bee.display();
+      for (var i = 0; i < preyList.length; i++) {
+        preyList[i].display();
+      }
       break;
     case 3: // Game Over
       push();
@@ -207,14 +203,49 @@ function draw() {
 function reset() {
   tiger = new Predator(width/2-width/3, height/2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32, tigerImage);
   snowLeopard = new Predator(width/2+width/3, height/2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96, snowLeopardImage);
-  antelope = new Prey(100, 100, 10, color(255, 100, 10), 50, antelopeImage);
-  zebra = new Prey(100, 100, 8, color(255, 255, 255), 60, zebraImage);
-  bee = new Prey(100, 100, 20, color(255, 255, 0), 10, beeImage);
-  apple = new Fruit(100, 100, 20, color(255, 255, 0), 10, appleImage);
-  banana = new Fruit(100, 100, 20, color(255, 255, 0), 10, bananaImage);
-  peach = new Fruit(100, 100, 20, color(255, 255, 0), 10, peachImage);
-  hunterOne = new Hunter(100, 100, 20, color(255, 255, 0), 10, hunterOneImage);
-  hunterTwo = new Hunter(100, 100, 20, color(255, 255, 0), 10, hunterTwoImage);
+  // Spawn 10 prey
+  for (var i = 0; i < 10; i++) {
+    let whichPrey;
+    let preyImage;
+    whichPrey = floor(random(0, 3));
+    let preyInfo;
+    switch (whichPrey) {
+      case 0:
+        preyInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          speed: 10,
+          color: color(255, 100, 10),
+          radius: random(40, 50),
+          image: antelopeImage
+        }
+        break;
+      case 1:
+        preyInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          speed: 10,
+          color: color(255, 255, 255),
+          radius: random(50, 60),
+          image: zebraImage
+        }
+        break;
+      case 2:
+        preyInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          speed: 10,
+          color: color(255, 255, 0),
+          radius: random(10, 20),
+          image: beeImage
+        }
+        break;
+      default:
+    }
+    let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image);
+    preyList.push(newPrey);
+    preyNum++;
+  }
 }
 
 // mousePressed()

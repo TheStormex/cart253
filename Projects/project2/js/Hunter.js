@@ -3,7 +3,8 @@
 // A class that represents a simple hunter that moves
 // on screen based on a noise() function. It can move around
 // the screen and be consumed by predator objects as well as
-// Shoot out bullet objects
+// Shoot out bullet objects more nad more frequently as time goes on
+// Spawns more the longer the game goes on
 
 class Hunter {
 

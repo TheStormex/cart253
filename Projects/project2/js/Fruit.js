@@ -21,8 +21,6 @@ class Fruit {
     this.radius = this.health;
     // The fruit's image
     this.image = image;
-    // Add 1 to the list of fruits
-    fruitArray ++;
   }
 
   // display

@@ -1,8 +1,8 @@
 // Bullet
 //
-// A class that represents a simple prey that moves
-// on screen based on a noise() function. It can move around
-// the screen and be consumed by Predator objects.
+// A class that represents a simple bullet that moves
+// on screen in a straight line
+// damages the predator if touches it. Damage more and more as time goes on
 
 class Bullet {
 
@@ -59,7 +59,7 @@ class Bullet {
 
   // harm
   //
-  // Checks if touch a Predator, if so, hurt the predator
+  // Checks if touch a Predator, if so, hurt the predator and take away score
   harm(predator) {
     // Calculate distance from this predator to the predator
     let d = dist(this.x, this.y, predator.x, predator.y);
@@ -67,6 +67,7 @@ class Bullet {
     if (d < this.radius + predator.radius) {
       // Decrease preadator health then disappear
       predator.health -= 15;
+      predator.preyEaten = floor(predator.preyEaten/2);
       }
     }
 

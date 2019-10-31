@@ -24,6 +24,7 @@ class Prey {
     // Health properties
     this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
+    this.healthGainPerEat = 1;
     // Display properties
     this.fillColor = fillColor;
     this.radius = this.health;
@@ -67,6 +68,24 @@ class Prey {
     }
     else if (this.y > height) {
       this.y -= height;
+    }
+  }
+
+  // eatFruit
+  //
+  // Takes a Fruit object as an argument and checks if the prey
+  // overlaps it. If so, reduces the fruit's health and increases
+  // the prey's.
+  eatFruit(fruit) {
+    // Calculate distance from this prey to the fruit
+    let d = dist(this.x, this.y, fruit.x, fruit.y);
+    // Check if the distance is less than their two radii (an overlap)
+    if (d < this.radius + fruit.radius) {
+      // Increase prey health and constrain it to its possible range
+      this.health += this.healthGainPerEat;
+      this.health = constrain(this.health, 0, this.maxHealth);
+      // Decrease fruit health by the same amount
+      fruit.health -= this.healthGainPerEat;
     }
   }
 

@@ -26,6 +26,7 @@ class Hunter {
     // Health properties
     this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
+    this.healthGainPerEat = 1;
     // Display properties
     this.fillColor = fillColor;
     this.radius = this.health;
@@ -77,6 +78,26 @@ class Hunter {
   // Shoots a bullet which harms the predator
   shoot() {
 
+  }
+
+  // handleEating
+  //
+  // Takes a Prey / Fruit object as an argument and checks if the hunter
+  // overlaps it. If so, reduces the prey's health and increases
+  // the hunter's. If the eatble dies, it gets reset.
+  handleEating(eatable) {
+    // Calculate distance from this predator to the prey
+    let d = dist(this.x, this.y, eatable.x, eatable.y);
+    // Check if the distance is less than their two radii (an overlap)
+    if (d < this.radius + eatable.radius) {
+      if (eatable.health > 0) {
+        // Increase hunter health and constrain it to its possible range
+        this.health += this.healthGainPerEat;
+        this.health = constrain(this.health, 0, this.maxHealth);
+        // Decrease eatable health by the same amount
+        eatable.health -= this.healthGainPerEat;
+      }
+    }
   }
 
   // display

@@ -139,28 +139,49 @@ function draw() {
       pop();
       break;
     case 2: // Game
+      // temporary background
+      image(backgroundImage, width/2 , height/2 , width, height);
+
+
       // Handle input for the tiger
       tiger.handleInput();
       snowLeopard.handleInput();
 
-      // Move all the "animals"
+      // Move the predators
       tiger.move();
       snowLeopard.move();
+
+      // Prey actions
       for (var i = 0; i < preyList.length; i++) {
         preyList[i].move();
-      }
-
-      // Handle the predators eating any of the prey
-      for (var i = 0; i < preyList.length; i++) {
+        for (var i2 = 0; i2 < fruitList.length; i2++) {
+          preyList[i].eatFruit(fruitList[i2]);
+        }
         tiger.handleEating(preyList[i]);
         snowLeopard.handleEating(preyList[i]);
+        for (var i3 = 0; i3 < hunterList.length; i3++) {
+          hunterList[i3].handleEating(preyList[i])
+        }
+        preyList[i].display();
       }
 
-      // Display all the "animals"
+      // Hunter actions
+      for (var i = 0; i < hunterList.length; i++) {
+        hunterList[i].move();
+        tiger.handleEating(hunterList[i]);
+        snowLeopard.handleEating(hunterList[i]);
+        hunterList[i].display();
+      }
+
+      // Display the predators
       tiger.display();
       snowLeopard.display();
-      for (var i = 0; i < preyList.length; i++) {
-        preyList[i].display();
+
+      // See if fuits are being eaten by preadtors then Display fruits
+      for (var i = 0; i < fruitList.length; i++) {
+        tiger.handleEating(fruitList[i]);
+        snowLeopard.handleEating(fruitList[i]);
+        fruitList[i].display();
       }
       break;
     case 3: // Game Over
@@ -203,6 +224,10 @@ function draw() {
 function reset() {
   tiger = new Predator(width/2-width/3, height/2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32, tigerImage);
   snowLeopard = new Predator(width/2+width/3, height/2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96, snowLeopardImage);
+  // If there were a previous game, delete all preys, fruits, bullets and hunters
+    preyList = [];
+    hunterList = [];
+    fruitList = [];
   // Spawn 10 prey
   for (var i = 0; i < 10; i++) {
     let whichPrey;
@@ -245,6 +270,79 @@ function reset() {
     let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image);
     preyList.push(newPrey);
     preyNum++;
+  }
+  // Spawn 6 fruits
+  for (var i = 0; i < 6; i++) {
+    let whichFruit;
+    let fruitImage;
+    whichFruit = floor(random(0, 3));
+    let fruitInfo;
+    switch (whichFruit) {
+      case 0:
+        fruitInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          color: color(255, 100, 10),
+          radius: random(20, 30),
+          image: appleImage
+        }
+        break;
+      case 1:
+        fruitInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          color: color(255, 255, 255),
+          radius: random(25, 35),
+          image: peachImage
+        }
+        break;
+      case 2:
+        fruitInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          color: color(255, 255, 0),
+          radius: random(40, 50),
+          image: bananaImage
+        }
+        break;
+      default:
+    }
+    let newFruit = new Fruit(fruitInfo.x, fruitInfo.y, fruitInfo.speed, fruitInfo.color, fruitInfo. radius, fruitInfo.image);
+    fruitList.push(newFruit);
+    fruitNum++;
+  }
+  // Spawn 2 Hunters
+  for (var i = 0; i < 2; i++) {
+    let whichHunter;
+    let hunterImage;
+    whichHunter = floor(random(0, 2));
+    let hunterInfo;
+    switch (whichHunter) {
+      case 0:
+        hunterInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          speed: 10,
+          color: color(0, 255, 0),
+          radius: random(30, 40),
+          image: hunterOneImage
+        }
+        break;
+      case 1:
+        hunterInfo = {
+          x: random(0, width),
+          y: random(0, height),
+          speed: 10,
+          color: color(0, 255, 0),
+          radius: random(50, 60),
+          image: hunterTwoImage
+        }
+        break;
+      default:
+    }
+    let newHunter = new Hunter(hunterInfo.x, hunterInfo.y, hunterInfo.speed, hunterInfo.color, hunterInfo.radius, hunterInfo.image);
+    hunterList.push(newHunter);
+    hunterNum++;
   }
 }
 

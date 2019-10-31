@@ -69,7 +69,10 @@ class Predator {
     if (keyIsDown(this.sprintKey)) {
       this.vx *= 2;
       this.vy *= 2;
-      this.healthLossPerMove = 0.2;
+      // If the predator is moving when sprinting
+      if (this.vx != 0 || this.vy != 0) {
+        this.healthLossPerMove = 0.2;
+      }
     }
   }
 
@@ -112,23 +115,27 @@ class Predator {
 
   // handleEating
   //
-  // Takes a Prey object as an argument and checks if the predator
+  // Takes a Prey / Fruit / Hunter object as an argument and checks if the predator
   // overlaps it. If so, reduces the prey's health and increases
-  // the predator's. If the prey dies, it gets reset.
-  handleEating(prey) {
+  // the predator's. If the eatble dies, it gets reset.
+  handleEating(eatable) {
     // Calculate distance from this predator to the prey
-    let d = dist(this.x, this.y, prey.x, prey.y);
+    let d = dist(this.x, this.y, eatable.x, eatable.y);
     // Check if the distance is less than their two radii (an overlap)
-    if (d < this.radius + prey.radius) {
-      // Increase predator health and constrain it to its possible range
-      this.health += this.healthGainPerEat;
-      this.health = constrain(this.health, 0, this.maxHealth);
-      // Decrease prey health by the same amount
-      prey.health -= this.healthGainPerEat;
-      // Check if the prey died and reset it if so and add 1 prey eaten
-      if (prey.health < 0) {
-        this.preyEaten += 1;
-        prey.reset();
+    if (d < this.radius + eatable.radius) {
+      if (eatable.health > 0) {
+        // Increase predator health and constrain it to its possible range
+        this.health += this.healthGainPerEat;
+        this.health = constrain(this.health, 0, this.maxHealth);
+        // Decrease eatable health by the same amount
+        eatable.health -= this.healthGainPerEat;
+        // Check if the prey died and reset it if so and add 1 prey eaten
+        if (eatable.health < 0) {
+          if (eatable instanceof Prey) {
+            this.preyEaten += 1;
+            eatable.reset();
+          }
+        }
       }
     }
   }

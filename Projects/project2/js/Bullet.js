@@ -14,48 +14,74 @@ class Bullet {
     // Position
     this.x = x;
     this.y = y;
-    // Velocity and speed
+    // Speed
+    this.speed = speed;
+    // Get a direction for velocity
     this.vx = 0;
     this.vy = 0;
-    this.speed = speed;
     // Display properties
     this.fillColor = fillColor;
     this.radius = radius;
     // The bullets's image
     this.image = image;
+
   }
 
+  direction() {
+    let leftRight = random(0,2)
+    switch (leftRight) {
+      case 0:
+          this.vx = random(this.speed*0.7, this.speed*1.3);
+        break;
+      case 1:
+          this.vx = -(random(this.speed*0.7, this.speed*1.3));
+        break;
+      default:
+    }
+    let upDown = random(0,2)
+    switch (upDown) {
+      case 0:
+          this.vy = random(this.speed*0.7, this.speed*1.3);
+        break;
+      case 1:
+          this.vy = -(random(this.speed*0.7, this.speed*1.3));
+        break;
+      default:
+    }
+  }
   // move
   //
   // Moves in a straight line until it hits a wall or a predator
   move() {
     // Update position
+    console.log(this.vx);
+    console.log(this.vy);
     this.x += this.vx;
     this.y += this.vy;
     // Exit if left screen
-    this.exit();
+    // this.exit();
   }
 
   // exit
   //
   // Checks if the bullet has gone off the canvas and
   // destroy it.
-  exit() {
-    // Off the left or right
-    if (this.x < 0) {
-      remove(this);
-    }
-    else if (this.x > width) {
-      remove(this);
-    }
-    // Off the top or bottom
-    if (this.y < 0) {
-      remove(this);
-    }
-    else if (this.y > height) {
-      remove(this);
-    }
-  }
+  // exit() {
+  //   // Off the left or right
+  //   if (this.x < 0) {
+  //     bulletList[]
+  //   }
+  //   else if (this.x > width) {
+  //     remove(this);
+  //   }
+  //   // Off the top or bottom
+  //   if (this.y < 0) {
+  //     remove(this);
+  //   }
+  //   else if (this.y > height) {
+  //     remove(this);
+  //   }
+  // }
 
   // harm
   //

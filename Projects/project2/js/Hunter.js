@@ -32,6 +32,9 @@ class Hunter {
     this.radius = this.health;
     // The hunter's image
     this.image = image;
+    // How long time before this hunter shooots
+    this.bulletTimer = millis();
+    this.bulletSpawnRate = random(1500,2500);
   }
 
   // move
@@ -77,7 +80,10 @@ class Hunter {
   //
   // Shoots a bullet which harms the predator
   shoot() {
-
+    let newBullet = new Bullet(this.x, this.y, 8, color(0,0,0), 15, bulletImage);
+    newBullet.direction();
+    bulletList.push(newBullet);
+    bulletNum++;
   }
 
   // handleEating

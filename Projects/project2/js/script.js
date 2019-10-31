@@ -43,6 +43,16 @@ let fruitList = [];
 let bulletList = [];
 let preyList = [];
 
+// Respawn tiemrs
+let hunterTimer;
+let fruitTimer;
+let preyTimer;
+
+// How often preys, hunters and fruit spawns
+let hunterSpawnRate = 5000;
+let fruitSpawnRate = 3000;
+let preySpawnRate = 3000;
+
 // Background iamge
 let backgroundImage;
 
@@ -183,6 +193,17 @@ function draw() {
         snowLeopard.handleEating(fruitList[i]);
         fruitList[i].display();
       }
+
+      // Bullet actions
+      for (var i = 0; i < bulletList.length; i++) {
+        bulletList[i].move();
+        bulletList[i].harm(tiger);
+        bulletList[i].harm(snowLeopard);
+        bulletList[i].display();
+      }
+
+      respawn();
+
       break;
     case 3: // Game Over
       push();
@@ -218,6 +239,132 @@ function draw() {
 
   }
 }
+
+//spawnPrey
+//
+// Create a Prey
+function spawnPrey() {
+  let whichPrey;
+  let preyImage;
+  whichPrey = floor(random(0, 3));
+  let preyInfo;
+  switch (whichPrey) {
+    case 0:
+      preyInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        speed: 10,
+        color: color(255, 100, 10),
+        radius: random(40, 50),
+        image: antelopeImage
+      }
+      break;
+    case 1:
+      preyInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        speed: 10,
+        color: color(255, 255, 255),
+        radius: random(50, 60),
+        image: zebraImage
+      }
+      break;
+    case 2:
+      preyInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        speed: 10,
+        color: color(255, 255, 0),
+        radius: random(10, 20),
+        image: beeImage
+      }
+      break;
+    default:
+  }
+  let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image);
+  preyList.push(newPrey);
+  preyNum++;
+}
+
+// spawnFruit()
+//
+// Create a fruit
+function spawnFruit() {
+  let whichFruit;
+  let fruitImage;
+  whichFruit = floor(random(0, 3));
+  let fruitInfo;
+  switch (whichFruit) {
+    case 0:
+      fruitInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        color: color(255, 100, 10),
+        radius: random(20, 30),
+        image: appleImage
+      }
+      break;
+    case 1:
+      fruitInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        color: color(255, 255, 255),
+        radius: random(25, 35),
+        image: peachImage
+      }
+      break;
+    case 2:
+      fruitInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        color: color(255, 255, 0),
+        radius: random(40, 50),
+        image: bananaImage
+      }
+      break;
+    default:
+  }
+  let newFruit = new Fruit(fruitInfo.x, fruitInfo.y, fruitInfo.speed, fruitInfo.color, fruitInfo. radius, fruitInfo.image);
+  fruitList.push(newFruit);
+  fruitNum++;
+}
+
+// spawnHunter
+//
+// Create a hunter
+function spawnHunter() {
+  let whichHunter;
+  let hunterImage;
+  whichHunter = floor(random(0, 2));
+  let hunterInfo;
+  switch (whichHunter) {
+    case 0:
+      hunterInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        speed: 10,
+        color: color(0, 255, 0),
+        radius: random(30, 40),
+        image: hunterOneImage
+      }
+      break;
+    case 1:
+      hunterInfo = {
+        x: random(0, width),
+        y: random(0, height),
+        speed: 10,
+        color: color(0, 255, 0),
+        radius: random(50, 60),
+        image: hunterTwoImage
+      }
+      break;
+    default:
+  }
+  let newHunter = new Hunter(hunterInfo.x, hunterInfo.y, hunterInfo.speed, hunterInfo.color, hunterInfo.radius, hunterInfo.image);
+  hunterList.push(newHunter);
+  hunterNum++;
+}
+
 // reset()
 //
 // Reset all stats and start the game over
@@ -230,119 +377,15 @@ function reset() {
     fruitList = [];
   // Spawn 10 prey
   for (var i = 0; i < 10; i++) {
-    let whichPrey;
-    let preyImage;
-    whichPrey = floor(random(0, 3));
-    let preyInfo;
-    switch (whichPrey) {
-      case 0:
-        preyInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          speed: 10,
-          color: color(255, 100, 10),
-          radius: random(40, 50),
-          image: antelopeImage
-        }
-        break;
-      case 1:
-        preyInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          speed: 10,
-          color: color(255, 255, 255),
-          radius: random(50, 60),
-          image: zebraImage
-        }
-        break;
-      case 2:
-        preyInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          speed: 10,
-          color: color(255, 255, 0),
-          radius: random(10, 20),
-          image: beeImage
-        }
-        break;
-      default:
-    }
-    let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image);
-    preyList.push(newPrey);
-    preyNum++;
+    spawnPrey();
   }
   // Spawn 6 fruits
   for (var i = 0; i < 6; i++) {
-    let whichFruit;
-    let fruitImage;
-    whichFruit = floor(random(0, 3));
-    let fruitInfo;
-    switch (whichFruit) {
-      case 0:
-        fruitInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          color: color(255, 100, 10),
-          radius: random(20, 30),
-          image: appleImage
-        }
-        break;
-      case 1:
-        fruitInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          color: color(255, 255, 255),
-          radius: random(25, 35),
-          image: peachImage
-        }
-        break;
-      case 2:
-        fruitInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          color: color(255, 255, 0),
-          radius: random(40, 50),
-          image: bananaImage
-        }
-        break;
-      default:
-    }
-    let newFruit = new Fruit(fruitInfo.x, fruitInfo.y, fruitInfo.speed, fruitInfo.color, fruitInfo. radius, fruitInfo.image);
-    fruitList.push(newFruit);
-    fruitNum++;
+    spawnFruit();
   }
-  // Spawn 2 Hunters
-  for (var i = 0; i < 2; i++) {
-    let whichHunter;
-    let hunterImage;
-    whichHunter = floor(random(0, 2));
-    let hunterInfo;
-    switch (whichHunter) {
-      case 0:
-        hunterInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          speed: 10,
-          color: color(0, 255, 0),
-          radius: random(30, 40),
-          image: hunterOneImage
-        }
-        break;
-      case 1:
-        hunterInfo = {
-          x: random(0, width),
-          y: random(0, height),
-          speed: 10,
-          color: color(0, 255, 0),
-          radius: random(50, 60),
-          image: hunterTwoImage
-        }
-        break;
-      default:
-    }
-    let newHunter = new Hunter(hunterInfo.x, hunterInfo.y, hunterInfo.speed, hunterInfo.color, hunterInfo.radius, hunterInfo.image);
-    hunterList.push(newHunter);
-    hunterNum++;
+  // Spawn 4 Hunters
+  for (var i = 0; i < 4; i++) {
+    spawnHunter();
   }
 }
 
@@ -358,6 +401,10 @@ function mousePressed () {
       break;
     case 1:
       if (mouseX > width/2-width/6 && mouseX < width/2+width/6 && mouseY > height-height/8-height/10 && mouseY < height-height/8+height/10) {
+        // Start the timers
+        hunterTimer = millis();
+        fruitTimer = millis();
+        preyTimer = millis();
         whichScreen = 2;
       }
       break;
@@ -372,5 +419,29 @@ function mousePressed () {
       break;
     default:
       break;
+  }
+}
+
+// respawn()
+//
+// Create more preys, hunters and fruits as well as shoot bullets from hunters
+function respawn() {
+  for (var i = 0; i < hunterList.length; i++) {
+    if (millis() - hunterList[i].bulletTimer >= hunterList[i].bulletSpawnRate) {
+      hunterList[i].shoot();
+      hunterList[i].bulletTimer = millis();
+    }
+  }
+  if (millis() - fruitTimer >= fruitSpawnRate) {
+    spawnFruit();
+    fruitTimer = millis();
+  }
+  if (millis() - hunterTimer >= hunterSpawnRate) {
+    spawnHunter();
+    hunterTimer = millis();
+  }
+  if (millis() - preyTimer >= preySpawnRate) {
+    spawnPrey();
+    preyTimer = millis();
   }
 }

@@ -106,18 +106,4 @@ class Prey {
       pop();
     }
   }
-
-  // reset
-  //
-  // Set the position to a random location and reset health
-  // and radius back to default
-  reset() {
-    // Random position
-    this.x = random(0, width);
-    this.y = random(0, height);
-    // Default health
-    this.health = this.maxHealth;
-    // Default radius
-    this.radius = this.health;
-  }
 }

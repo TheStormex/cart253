@@ -28,23 +28,23 @@ class Bullet {
   }
 
   direction() {
-    let leftRight = random(0,2)
+    let leftRight = floor(random(0,2));
     switch (leftRight) {
       case 0:
-          this.vx = random(this.speed*0.7, this.speed*1.3);
+          this.vx = random(this.speed*0.5, this.speed*1.5);
         break;
       case 1:
-          this.vx = -(random(this.speed*0.7, this.speed*1.3));
+          this.vx = -(random(this.speed*0.5, this.speed*1.5));
         break;
       default:
     }
-    let upDown = random(0,2)
+    let upDown = floor(random(0,2));
     switch (upDown) {
       case 0:
-          this.vy = random(this.speed*0.7, this.speed*1.3);
+          this.vy = random(this.speed*0.5, this.speed*1.5);
         break;
       case 1:
-          this.vy = -(random(this.speed*0.7, this.speed*1.3));
+          this.vy = -(random(this.speed*0.5, this.speed*1.5));
         break;
       default:
     }
@@ -54,8 +54,6 @@ class Bullet {
   // Moves in a straight line until it hits a wall or a predator
   move() {
     // Update position
-    console.log(this.vx);
-    console.log(this.vy);
     this.x += this.vx;
     this.y += this.vy;
     // Exit if left screen
@@ -92,7 +90,7 @@ class Bullet {
     // Check if the distance is less than their two radii (an overlap)
     if (d < this.radius + predator.radius) {
       // Decrease preadator health then disappear
-      predator.health -= 15;
+      predator.health /= 2;
       predator.preyEaten = floor(predator.preyEaten/2);
       }
     }

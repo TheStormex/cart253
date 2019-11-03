@@ -9,7 +9,7 @@ class Fruit {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius, image) {
+  constructor(x, y, speed, fillColor, radius, image, index) {
     // Position
     this.x = x;
     this.y = y;
@@ -21,6 +21,8 @@ class Fruit {
     this.radius = this.health;
     // The fruit's image
     this.image = image;
+    // This object's index in the array
+    this.index = index;
   }
 
   // display
@@ -39,19 +41,8 @@ class Fruit {
       image(this.image, this.x, this.y, this.radius, this.radius);
       pop();
     }
-  }
-
-  // reset
-  //
-  // Set the position to a random location and reset health
-  // and radius back to default
-  reset() {
-    // Random position
-    this.x = random(0, width);
-    this.y = random(0, height);
-    // Default health
-    this.health = this.maxHealth;
-    // Default radius
-    this.radius = this.health;
+    else {
+      var removed = fruitList.splice(this.index, 1);
+    }
   }
 }

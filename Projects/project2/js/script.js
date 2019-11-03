@@ -31,12 +31,6 @@ let peachImage;
 let banana;
 let bananaImage;
 
-// How many characters of each type is on the screen
-let hunterNum = 0;
-let fruitNum = 0;
-let bulletNum = 0;
-let preyNum = 0;
-
 // The character objects arrays
 let hunterList = [];
 let fruitList = [];
@@ -201,7 +195,7 @@ function draw() {
         bulletList[i].harm(snowLeopard);
         bulletList[i].display();
       }
-
+      // Spawn any more of any objects
       respawn();
 
       break;
@@ -236,7 +230,6 @@ function draw() {
       break;
     default:
     break;
-
   }
 }
 
@@ -281,9 +274,9 @@ function spawnPrey() {
       break;
     default:
   }
-  let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image);
+  let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image, preyList.length);
+  console.log(newPrey);
   preyList.push(newPrey);
-  preyNum++;
 }
 
 // spawnFruit()
@@ -324,9 +317,8 @@ function spawnFruit() {
       break;
     default:
   }
-  let newFruit = new Fruit(fruitInfo.x, fruitInfo.y, fruitInfo.speed, fruitInfo.color, fruitInfo. radius, fruitInfo.image);
+  let newFruit = new Fruit(fruitInfo.x, fruitInfo.y, fruitInfo.speed, fruitInfo.color, fruitInfo. radius, fruitInfo.image, fruitList.length);
   fruitList.push(newFruit);
-  fruitNum++;
 }
 
 // spawnHunter
@@ -360,9 +352,8 @@ function spawnHunter() {
       break;
     default:
   }
-  let newHunter = new Hunter(hunterInfo.x, hunterInfo.y, hunterInfo.speed, hunterInfo.color, hunterInfo.radius, hunterInfo.image);
+  let newHunter = new Hunter(hunterInfo.x, hunterInfo.y, hunterInfo.speed, hunterInfo.color, hunterInfo.radius, hunterInfo.image, hunterList.length);
   hunterList.push(newHunter);
-  hunterNum++;
 }
 
 // reset()
@@ -425,7 +416,11 @@ function mousePressed () {
 // respawn()
 //
 // Create more preys, hunters and fruits as well as shoot bullets from hunters
+// And increase or decrease timers slightly to make game more difficult as time goes on
 function respawn() {
+  fruitSpawnRate += 5;
+  hunterSpawnRate -= 5;
+  preySpawnRate += 5;
   for (var i = 0; i < hunterList.length; i++) {
     if (millis() - hunterList[i].bulletTimer >= hunterList[i].bulletSpawnRate) {
       hunterList[i].shoot();

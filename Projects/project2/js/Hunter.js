@@ -12,7 +12,7 @@ class Hunter {
   //
   // Sets the initial values for the hunter's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius, image) {
+  constructor(x, y, speed, fillColor, radius, image, index) {
     // Position
     this.x = x;
     this.y = y;
@@ -35,6 +35,8 @@ class Hunter {
     // How long time before this hunter shooots
     this.bulletTimer = millis();
     this.bulletSpawnRate = random(1500,2500);
+    // Index of this object in the array
+    this.index = index;
   }
 
   // move
@@ -80,10 +82,9 @@ class Hunter {
   //
   // Shoots a bullet which harms the predator
   shoot() {
-    let newBullet = new Bullet(this.x, this.y, 6, color(0,0,0), 15, bulletImage);
+    let newBullet = new Bullet(this.x, this.y, 6, color(0,0,0), 15, bulletImage, bulletList.length);
     newBullet.direction();
     bulletList.push(newBullet);
-    bulletNum++;
   }
 
   // handleEating
@@ -121,6 +122,9 @@ class Hunter {
       ellipse(this.x, this.y, this.radius * 2);
       image(this.image, this.x, this.y, this.radius, this.radius);
       pop();
+    }
+    else {
+      var removed = hunterList.splice(this.index, 1);
     }
   }
 }

@@ -133,6 +133,7 @@ class Predator {
         if (eatable.health < 0) {
           if (eatable instanceof Prey) {
             this.preyEaten += 1;
+            audioPredatorEatPrey.play();
           }
         }
       }

@@ -47,8 +47,16 @@ let hunterSpawnRate = 5000;
 let fruitSpawnRate = 3000;
 let preySpawnRate = 3000;
 
-// Background iamge
+// Background iamges
 let backgroundImage;
+let backgroundGameImage;
+
+// Music and sound effects
+let audioSong;
+let audioButton;
+let audioShoot;
+let audioPredatorEatPrey;
+let audioPredatorHurt;
 
 // Which screen (title, instructions, game, game over)
 let whichScreen = 0;
@@ -69,6 +77,7 @@ hunterOneImage = loadImage("assets/images/hunter.png");
 hunterTwoImage = loadImage("assets/images/hunter2.jpg");
 bulletImage = loadImage("assets/images/bullet.jpg");
 backgroundImage = loadImage("assets/images/background.bmp");
+backgroundGameImage = loadImage("assets/images/backgroundGame.bmp");
 }
 
 // setup()
@@ -82,6 +91,12 @@ function setup() {
   imageMode(CENTER, CENTER);
   textAlign(CENTER, CENTER);
   reset();
+  // set up audio
+  audioSong = loadSound('assets/sounds/song.wav');
+  audioButton = loadSound('assets/sounds/button.wav');
+  audioShoot = loadSound('assets/sounds/shoot.wav');
+  audioPredatorEatPrey = loadSound('assets/sounds/eat.wav');
+  audioPredatorHurt = loadSound('assets/sounds/hurt.wav');
 
   // a fast small and a big slow hunter
 }
@@ -144,8 +159,7 @@ function draw() {
       break;
     case 2: // Game
       // temporary background
-      image(backgroundImage, width/2 , height/2 , width, height);
-
+      image(backgroundGameImage, width/2 , height/2 , width, height);
 
       // Handle input for the tiger
       tiger.handleInput();
@@ -200,6 +214,7 @@ function draw() {
 
       break;
     case 3: // Game Over
+      audioSong.stop();
       push();
       image(backgroundImage, width/2 , height/2 , width, height);
       fill(255, 0, 0);
@@ -275,7 +290,6 @@ function spawnPrey() {
     default:
   }
   let newPrey = new Prey(preyInfo.x, preyInfo.y, preyInfo.speed, preyInfo.color, preyInfo. radius, preyInfo.image, preyList.length);
-  console.log(newPrey);
   preyList.push(newPrey);
 }
 
@@ -382,11 +396,12 @@ function reset() {
 
 // mousePressed()
 //
-// When mouse is pressed
+// When mouse is pressed when over a button
 function mousePressed () {
   switch (whichScreen) {
     case 0:
       if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
+        audioButton.play();
         whichScreen = 1;
       }
       break;
@@ -396,6 +411,9 @@ function mousePressed () {
         hunterTimer = millis();
         fruitTimer = millis();
         preyTimer = millis();
+        audioButton.play();
+        // Play song
+        audioSong.loop();
         whichScreen = 2;
       }
       break;
@@ -405,6 +423,15 @@ function mousePressed () {
     case 3:
     if (mouseX > width/2-width/8 && mouseX < width/2+width/8 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
       reset();
+      hunterTimer = millis();
+      fruitTimer = millis();
+      preyTimer = millis();
+      audioButton.play();
+      // Play song
+      audioSong.loop();
+      fruitSpawnRate = 3000;
+      hunterSpawnRate = 5000;
+      preySpawnRate = 3000;
       whichScreen = 2;
     }
       break;
@@ -419,8 +446,11 @@ function mousePressed () {
 // And increase or decrease timers slightly to make game more difficult as time goes on
 function respawn() {
   fruitSpawnRate += 5;
+  fruitSpawnRate = constrain(fruitSpawnRate, 3000, 7000);
   hunterSpawnRate -= 5;
+  hunterSpawnRate = constrain(hunterSpawnRate, 500, 5000);
   preySpawnRate += 5;
+  preySpawnRate = constrain(preySpawnRate, 3000, 7000);
   for (var i = 0; i < hunterList.length; i++) {
     if (millis() - hunterList[i].bulletTimer >= hunterList[i].bulletSpawnRate) {
       hunterList[i].shoot();
@@ -429,14 +459,18 @@ function respawn() {
   }
   if (millis() - fruitTimer >= fruitSpawnRate) {
     spawnFruit();
+    console.log('fruit');
     fruitTimer = millis();
   }
   if (millis() - hunterTimer >= hunterSpawnRate) {
+    console.log(millis() - hunterTimer);
     spawnHunter();
+    console.log('hunter');
     hunterTimer = millis();
   }
   if (millis() - preyTimer >= preySpawnRate) {
     spawnPrey();
+    console.log('prey');
     preyTimer = millis();
   }
 }

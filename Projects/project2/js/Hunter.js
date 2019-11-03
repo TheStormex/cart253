@@ -85,6 +85,7 @@ class Hunter {
     let newBullet = new Bullet(this.x, this.y, 6, color(0,0,0), 15, bulletImage, bulletList.length);
     newBullet.direction();
     bulletList.push(newBullet);
+    audioShoot.play();
   }
 
   // handleEating

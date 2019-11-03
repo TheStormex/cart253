@@ -96,6 +96,7 @@ class Bullet {
       // Decrease preadator health then disappear
       predator.health -= 6;
       predator.preyEaten = floor(predator.preyEaten/2);
+      audioPredatorHurt.play();
       this.health = 0;
     }
   }

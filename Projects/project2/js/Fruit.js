@@ -40,8 +40,7 @@ class Fruit {
       ellipse(this.x, this.y, this.radius * 2);
       image(this.image, this.x, this.y, this.radius, this.radius);
       pop();
-    }
-    else {
+    } else {
       var removed = fruitList.splice(this.index, 1);
     }
   }

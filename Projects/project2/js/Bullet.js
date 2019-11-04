@@ -32,23 +32,23 @@ class Bullet {
   }
 
   direction() {
-    let leftRight = floor(random(0,2));
+    let leftRight = floor(random(0, 2));
     switch (leftRight) {
       case 0:
-          this.vx = random(this.speed*0.5, this.speed*1.5);
+        this.vx = random(this.speed * 0.5, this.speed * 1.5);
         break;
       case 1:
-          this.vx = -(random(this.speed*0.5, this.speed*1.5));
+        this.vx = -(random(this.speed * 0.5, this.speed * 1.5));
         break;
       default:
     }
-    let upDown = floor(random(0,2));
+    let upDown = floor(random(0, 2));
     switch (upDown) {
       case 0:
-          this.vy = random(this.speed*0.5, this.speed*1.5);
+        this.vy = random(this.speed * 0.5, this.speed * 1.5);
         break;
       case 1:
-          this.vy = -(random(this.speed*0.5, this.speed*1.5));
+        this.vy = -(random(this.speed * 0.5, this.speed * 1.5));
         break;
       default:
     }
@@ -72,15 +72,13 @@ class Bullet {
     // Off the left or right
     if (this.x < 0) {
       this.health = 0;
-    }
-    else if (this.x > width) {
+    } else if (this.x > width) {
       this.health = 0;
     }
     // Off the top or bottom
     if (this.y < 0) {
       this.health = 0;
-    }
-    else if (this.y > height) {
+    } else if (this.y > height) {
       this.health = 0;
     }
   }
@@ -95,7 +93,7 @@ class Bullet {
     if (d < this.radius + predator.radius) {
       // Decrease preadator health then disappear
       predator.health -= 6;
-      predator.preyEaten = floor(predator.preyEaten/2);
+      predator.preyEaten = floor(predator.preyEaten / 2);
       audioPredatorHurt.play();
       this.health = 0;
     }
@@ -113,8 +111,7 @@ class Bullet {
       ellipse(this.x, this.y, this.radius * 2);
       image(this.image, this.x, this.y, this.radius, this.radius);
       pop();
-    }
-    else {
+    } else {
       var removed = bulletList.splice(this.index, 1);
     }
   }

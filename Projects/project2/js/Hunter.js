@@ -34,7 +34,7 @@ class Hunter {
     this.image = image;
     // How long time before this hunter shooots
     this.bulletTimer = millis();
-    this.bulletSpawnRate = random(1500,2500);
+    this.bulletSpawnRate = random(1500, 2500);
     // Index of this object in the array
     this.index = index;
   }
@@ -65,15 +65,13 @@ class Hunter {
     // Off the left or right
     if (this.x < 0) {
       this.x += width;
-    }
-    else if (this.x > width) {
+    } else if (this.x > width) {
       this.x -= width;
     }
     // Off the top or bottom
     if (this.y < 0) {
       this.y += height;
-    }
-    else if (this.y > height) {
+    } else if (this.y > height) {
       this.y -= height;
     }
   }
@@ -82,7 +80,7 @@ class Hunter {
   //
   // Shoots a bullet which harms the predator
   shoot() {
-    let newBullet = new Bullet(this.x, this.y, 6, color(0,0,0), 15, bulletImage, bulletList.length);
+    let newBullet = new Bullet(this.x, this.y, 6, color(0, 0, 0), 15, bulletImage, bulletList.length);
     newBullet.direction();
     bulletList.push(newBullet);
     audioShoot.play();
@@ -123,8 +121,7 @@ class Hunter {
       ellipse(this.x, this.y, this.radius * 2);
       image(this.image, this.x, this.y, this.radius, this.radius);
       pop();
-    }
-    else {
+    } else {
       var removed = hunterList.splice(this.index, 1);
     }
   }

@@ -10,7 +10,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius, upKey, downKey, leftKey, rightKey, sprintKey, image) {
+  constructor(x, y, speed, fillColor, radius, upKey, downKey, leftKey, rightKey, sprintKey, image, lose) {
     // Position
     this.x = x;
     this.y = y;
@@ -36,6 +36,8 @@ class Predator {
     this.preyEaten = 0;
     // The image of the predator
     this.image = image;
+    // If this predator loses, give back this info
+    this.lose = lose;
   }
 
   // handleInput
@@ -82,8 +84,8 @@ class Predator {
     this.x += this.vx;
     this.y += this.vy;
     // Update health
-    // this.health = this.health - this.healthLossPerMove;
-    // this.health = constrain(this.health, 0, this.maxHealth);
+    this.health = this.health - this.healthLossPerMove;
+    this.health = constrain(this.health, 0, this.maxHealth);
     // Handle wrapping
     this.handleWrapping();
   }
@@ -128,6 +130,11 @@ class Predator {
           if (eatable instanceof Prey) {
             this.preyEaten += 1;
             audioPredatorEatPrey.play();
+            // if has 10 or more prey eaten, wins
+            if (this.preyEaten >= 10) {
+              predatorLost = this.lose * -1;
+              whichScreen = 3;
+            }
           }
         }
       }
@@ -158,6 +165,7 @@ class Predator {
       text(this.preyEaten, this.x, this.y - height / 20);
       pop();
     } else {
+      predatorLost = this.lose;
       whichScreen = 3;
     }
   }

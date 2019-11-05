@@ -92,8 +92,7 @@ class Bullet {
     // Check if the distance is less than their two radii (an overlap)
     if (d < this.radius + predator.radius) {
       // Decrease preadator health then disappear
-      predator.health -= 6;
-      predator.preyEaten = floor(predator.preyEaten / 2);
+      predator.health -= 10;
       audioPredatorHurt.play();
       this.health = 0;
     }

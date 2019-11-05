@@ -44,7 +44,7 @@ let preyTimer;
 
 // How often preys, hunters and fruit spawns
 let hunterSpawnRate = 5000;
-let fruitSpawnRate = 1000;
+let fruitSpawnRate = 2000;
 let preySpawnRate = 1500;
 
 // Background iamges
@@ -60,6 +60,9 @@ let audioPredatorHurt;
 
 // Which screen (title, instructions, game, game over)
 let whichScreen = 0;
+
+// Which predator died first (0 = none, 1 =  tiger, -1 = snow leopard)
+let predatorLost = 0;
 
 // preload()
 //
@@ -145,10 +148,10 @@ function draw() {
       text("Who shall be the greatest predator of them all?", width / 2, height / 4 + (height / 20) * 2);
       text("The fearsome tiger or the deadly snow leopard?", width / 2, height / 4 + (height / 20) * 3);
       text("Hunt down the bee, antelope and zebra!", width / 2, height / 4 + (height / 20) * 4);
-      text("Avoid the hunter's bullets!", width / 2, height / 4 + (height / 20) * 5);
-      text("Eat the hunter before it eats your prey!", width / 2, height / 4 + (height / 20) * 6);
-      text("The fruits can be eaten by all characters!", width / 2, height / 4 + (height / 20) * 7);
-      text("The last predator standing wins! Will it be you?", width / 2, height / 4 + (height / 20) * 8);
+      text("Avoid the hunter's bullets and eat the hunter", width / 2, height / 4 + (height / 20) * 5);
+      text("before it eats your prey! The fruits can be", width / 2, height / 4 + (height / 20) * 6);
+      text("eaten by all characters! The last predator standing", width / 2, height / 4 + (height / 20) * 7);
+      text("or getting 10 preys first wins! Will it be you?", width / 2, height / 4 + (height / 20) * 8);
       text("Good luck out there! Top the food chain!", width / 2, height / 4 + (height / 20) * 9);
       fill(100, 255, 100);
       rect(width / 2, height - height / 8, width / 3, height / 5);
@@ -177,7 +180,7 @@ function draw() {
         // // Give each prey its correct index
         preyList[i].index = preyList.indexOf(preyList[i]);
 
-        //  preyList[i].move();
+        preyList[i].move();
         for (var i2 = 0; i2 < fruitList.length; i2++) {
           preyList[i].eatFruit(fruitList[i2]);
         }
@@ -214,6 +217,8 @@ function draw() {
 
       //  Bullet actions
       for (var i = 0; i < bulletList.length; i++) {
+        // // Give each prey its correct index
+        bulletList[i].index = bulletList.indexOf(bulletList[i]);
         bulletList[i].move();
         bulletList[i].harm(tiger);
         bulletList[i].harm(snowLeopard);
@@ -238,13 +243,13 @@ function draw() {
 
       // Put the image of the winninf predator based on who lost
       textSize(width / 15);
-      if (tiger.preyEaten > snowLeopard.preyEaten) {
+      if (predatorLost < 0) {
         image(tigerImage, width / 2, height / 2, width / 8, height / 8);
         text("The Tiger Wins!", width / 2, height / 3);
-      } else if (tiger.preyEaten < snowLeopard.preyEaten) {
+      } else if (predatorLost > 0) {
         image(snowLeopardImage, width / 2, height / 2, width / 8, height / 8);
         text("The Snow Leopard Wins!", width / 2, height / 3);
-      } else if (tiger.preyEaten === snowLeopard.preyEaten) {
+      } else if (predatorLost === 0) {
         text("No Contest", width / 2, height / 2 - height / 6);
       }
       pop();
@@ -380,13 +385,14 @@ function spawnHunter() {
 //
 // Reset all stats and start the game over
 function reset() {
-  tiger = new Predator(width / 2 - width / 3, height / 2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32, tigerImage);
-  snowLeopard = new Predator(width / 2 + width / 3, height / 2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96, snowLeopardImage);
+  tiger = new Predator(width / 2 - width / 3, height / 2, 5, color(255, 0, 0), 40, 87, 83, 65, 68, 32, tigerImage, 1);
+  snowLeopard = new Predator(width / 2 + width / 3, height / 2, 5, color(0, 0, 255), 40, 38, 40, 37, 39, 96, snowLeopardImage, -1);
   // If there were a previous game, delete all preys, fruits, bullets and hunters
   preyList = [];
   hunterList = [];
   fruitList = [];
   bulletList = [];
+  predatorLost = 0;
   // Spawn 10 prey
   for (var i = 0; i < 10; i++) {
     spawnPrey();
@@ -435,9 +441,9 @@ function mousePressed() {
         audioButton.play();
         // Play song
         audioSong.loop();
-        fruitSpawnRate = 3000;
+        fruitSpawnRate = 2000;
         hunterSpawnRate = 5000;
-        preySpawnRate = 3000;
+        preySpawnRate = 1500;
         whichScreen = 2;
       }
       break;

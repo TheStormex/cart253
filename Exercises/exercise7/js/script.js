@@ -5,7 +5,7 @@
 // A turn based RPG with cards and mini games
 
 // which screen it is 0 = title, 1 = instructions, 2 = game, 3 = minigame, 4 = game over (win or lose);
-let whichScreen = 2;
+let whichScreen = 4;
 
 // Whose turn it is, player (1) or enemy (-1)
 let whoseTurn = 1;
@@ -75,9 +75,7 @@ function draw() {
       rectMode(CENTER);
       noStroke();
       fill(0,0,255);
-      //theButton =
-      rect(button.x, button.y, button.size, button.size*2/3);
-      //theButton.mousePressed(buttonPressed);
+      rect(width/2, height-height/4, width/5, width/(15/2));
       fill(0);
       textSize(width/10);
       textAlign(CENTER,CENTER);
@@ -99,16 +97,16 @@ function draw() {
       fill(0,0,255);
       rect(button.x, button.y, button.size, button.size*2/3);
       fill(0);
-      textSize(width/10);
+      textSize(width/20);
       textAlign(CENTER,CENTER);
       text(button.text, button.x , button.y);
       pop();
       // Instruction text
       push();
-      textSize(width/10);
+      textSize(width/20);
       fill(255);
       textAlign(CENTER, CENTER);
-      text("Instructions", width/2, height/3);
+      text("Instructions", width/2, height/8);
       pop();
       break;
     case 2: // Game
@@ -173,45 +171,62 @@ function draw() {
 
       break;
     case 3: // Mini game
+    // create a white canvas for minigame
+      push();
+      rectMode(CENTER);
+      strokeWeight(5);
+      stroke(0);
+      fill(255);
+      rect(width/2,height/2,width,height);
+      pop();
       switch (whoseTurn) {
         case 1:
-
+          // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
           break;
         case -1:
-
+          // spawn bullets (random size and speed) that fly accross the screen 3 per second
           break;
         default:
 
       }
-      player.displayGame();
       break;
     case 4: // Game over
-      //
+      // see who won through switch, then present either happy or sad ending
 
       break;
     default:
   }
 }
 
-// buttonPressed
+// mousePressed
 //
 // when the button is pressed
-function buttonPressed() {
+function mousePressed() {
   switch (whichScreen) {
     case 0:
-
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+        // move to screen 1
+      }
       break;
     case 1:
-
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+        // move to screen 2
+      }
       break;
     case 2:
-
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+        // use an ability
+      }
       break;
     case 3:
-
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+        // move to screen 1
+      }
       break;
     case 4:
-
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+        // move to screen 1
+      }
       break;
     default:
 

@@ -14,8 +14,8 @@ class Ability {
     // Size
     this.sizeX = width/6;
     this.sizeY = height/3;
-    // The text
-    this.text = text;
+    // The name
+    this.name = name;
   }
   display() {
     push();
@@ -24,9 +24,9 @@ class Ability {
     fill(0,255,255);
     rect(this.x, this.y, this.sizeX, this.sizeY);
     fill(0);
-    textSize(width/10);
+    textSize(width/40+height/40);
     textAlign(CENTER,CENTER);
-    text(this.name, this.x , this.y);
+    text(this.name, this.x , this.y-this.y/8);
     pop();
   }
 

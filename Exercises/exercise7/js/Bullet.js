@@ -1,7 +1,7 @@
 // Bullet
 //
-// A super class for the bullets
+// Enemy bullets in the mini game
 
 
-class Bullet {
+class Bullet extends MinigameObj {
 }

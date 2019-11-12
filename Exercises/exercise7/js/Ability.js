@@ -1,6 +1,7 @@
 // Ability
 //
 // Ability class
+// the name, image and effect of the ability in the inventory.
 
 class Ability {
   // constructor
@@ -17,7 +18,7 @@ class Ability {
     // The name
     this.name = name;
   }
-  display() {
+  displayInventory() {
     push();
     rectMode(CENTER);
     noStroke();

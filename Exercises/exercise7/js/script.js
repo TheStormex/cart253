@@ -20,11 +20,17 @@ let chosenAbility;
 // Array of enemy bullets
 let bullets = [];
 
+// How many bullets the player ran into
+let bulletHits = 0;
+
 // Array of targets the player must hit in the mini game
 let targets = [];
 
 // Array of obstacles the player must not hit in the mini game
 let obstacles = [];
+
+// How many targets the player clicked on - obstacles clicked on
+let targetsHit = 0;
 
 // Array of abilities the player currently has
 let abilitiesHave = [];
@@ -53,19 +59,24 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   player = {
-    name: "Hero",
+    name: "Player",
     health: 50,
-    maxHealth: 50
+    maxHealth: 50,
+    x: width/2,
+    y: height/2,
+    speed: 5,
+    vx: 0,
+    vy: 0
   }
   enemy = {
-    name: "Monster",
+    name: "Enemy",
     health: 50,
     maxHealth: 50
   }
-  let abilityX = width/10;
+  let abilityX = width/10; // create our five starting abilities
   for (var i = 0; i < 5; i++) {
     let ability;
-    let newAbility = new Ability(abilityX, "name");
+    let newAbility = new Ability(abilityX, "Fire Spear", "Deal damage");
     abilitiesHave.push(newAbility);
     abilityX += width/5;
   }
@@ -92,10 +103,10 @@ function draw() {
       pop();
       // Title text
       push();
-      textSize(width/10);
+      textSize(width/20 + height/20);
       fill(255);
       textAlign(CENTER, CENTER);
-      text("Project 3", width/2, height/3);
+      text("Wizard Vs. Killer Robot", width/2, height/5);
       pop();
       break;
     case 1: // Instructions
@@ -117,6 +128,22 @@ function draw() {
       textAlign(CENTER, CENTER);
       text("Instructions", width/2, height/8);
       pop();
+      // The instructions
+      push();
+      fill(255);
+      rectMode(CENTER);
+      rect(width/2,height/4+height/6,width-width/10,height/2-height/20);
+      fill(0);
+      textSize(width/40+height/40);
+      textAlign(CENTER,CENTER);
+      text("You are a powerful wizard who can cast spells", width/2, height/4);
+      text("A killer robot stands in your way with giant guns", width/2, height/4+height/18);
+      text("Choose an ability in your inventory to use it", width/2, height/4+(height/18)*2);
+      text("Click on green circles and avoid red ones", width/2, height/4+(height/18)*3);
+      text("Control your vessel to dodge the bullets", width/2, height/4+(height/18)*4);
+      text("You will get another spell every turn", width/2, height/4+(height/18)*5);
+      text("Blow up the robot with your magic! Good luck!", width/2, height/4+(height/18)*6);
+      pop();
       break;
     case 2: // Game
       push()
@@ -134,8 +161,8 @@ function draw() {
       // The player's name
       textAlign(CENTER,CENTER);
       fill(0);
-      textSize(width/20);
-      text(player.name,width/7.5,height/2+height/10);
+      textSize(width/50+height/50);
+      text(player.name,width/7.5,height/2+height/12);
       // the player's health bar
       rectMode(CORNER);
       strokeWeight(5);
@@ -219,6 +246,7 @@ function draw() {
       break;
     case 3: // Mini game
     // create a white canvas for minigame
+    console.log(targets);
       push();
       rectMode(CENTER);
       strokeWeight(5);
@@ -229,8 +257,21 @@ function draw() {
       switch (whoseTurn) {
         case 1:
           if (millis() - minigameTimer < minigameTimerAmount) {
-              // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+            spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+            for (var i = 0; i < targets.length; i++) {
+              targets[i].index = targets.indexOf(targets[i]);
+              targets[i].clicked();
+              targets[i].move();
+              targets[i].display();
+            }
+            for (var i = 0; i < obstacles.length; i++) {
+              obstacles[i].index = obstacles.indexOf(obstacles[i]);
+              obstacles[i].clicked();
+              obstacles[i].move();
+              obstacles[i].display();
+            }
           } else { // go to effect of ability
+            // the ability's effect happen here before going to effect text
             textTimer = millis();
             subScreen = 2;
             whichScreen = 2;
@@ -238,8 +279,15 @@ function draw() {
           break;
         case -1:
         if (millis() - minigameTimer < minigameTimerAmount) {
-              // spawn bullets (random size and speed) that fly accross the screen 3 per second
+            spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+            for (var i = 0; i < bullets.length; i++) {
+              bullets[i].index = bullets.indexOf(bullets[i]);
+              bullets[i].move();
+              bullets[i].touchPlayer();
+              bullets[i].display();
+            }
           } else { // go to effect of ability
+            // the ability's effect happen here before going to effect text
             textTimer = millis();
             subScreen = 2;
             whichScreen = 2;
@@ -279,7 +327,6 @@ function mousePressed() {
           if (mouseX > abilitiesHave[i].x-abilitiesHave[i].sizeX/2 && mouseX < abilitiesHave[i].x+abilitiesHave[i].sizeX/2 && mouseY > abilitiesHave[i].y-abilitiesHave[i].sizeY/2 && mouseY < abilitiesHave[i].y+abilitiesHave[i].sizeY/2) {
             // choose this ability and go to text
             chosenAbility = abilitiesHave[i];
-            console.log(chosenAbility);
             textTimer = millis();
             subScreen = 1;
           }
@@ -298,5 +345,36 @@ function mousePressed() {
       break;
     default:
 
+  }
+}
+
+// spawn()
+//
+// create objects in the mini games
+function spawn() {
+  if (millis() - spawnTimer > spawnTimerAmount) {
+    let yPlace = floor(random(0,2)); // if object appears on top or bottom
+    let yObject;
+    if (yPlace === 0) {
+      yObject = 0;
+    }
+    if (yPlace === 1) {
+      yObject = height;
+    }
+    if (whoseTurn === 1) {
+      let whichObject = floor(random(0,2));
+      if (whichObject === 0) {
+        let newTarget = new Target(random(0, width), yObject, random(width/15, width/8), random(height/15, height/8), random(8, 12), random(8, 12), targets.length);
+        targets.push(newTarget);
+      } else if (whichObject === 1) {
+        let newObstacle = new Obstacle(random(0, width), yObject, random(width/15, width/8), random(height/15, height/8), random(8, 12), random(8, 12), obstacles.length);
+        obstacles.push(newObstacle);
+      }
+    }
+    if (whoseTurn === -1) {
+      let newBullet = new Bullet(random(0, width), yObject, random(width/15, width/8), random(height/15, height/8), random(8, 12), random(8, 12), bullets.length);
+      bullets.push(newBullet);
+    }
+  spawnTimer = millis();
   }
 }

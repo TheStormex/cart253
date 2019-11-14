@@ -14,6 +14,9 @@ let subScreen = 0;
 // Whose turn it is, player (1) or enemy (-1)
 let whoseTurn = 1;
 
+// Win or lose -1 = lose, 1 = win
+let victory = 0;
+
 // Which ability is chosen by the turn character
 let chosenAbility;
 
@@ -50,7 +53,7 @@ let minigameTimerAmount = 5000; // 5 seconds
 
 // spawnTimer and spawnTimerAmount: how long until another minigame object is spawned
 let spawnTimer = 0;
-let spawnTimerAmount = 250; // 1/4 of a second
+let spawnTimerAmount = 80; // 2/25 of a second
 
 // setup()
 //
@@ -64,7 +67,8 @@ function setup() {
     maxHealth: 50,
     x: width/2,
     y: height/2,
-    speed: 5,
+    size: width/20+height/20,
+    speed: 10,
     vx: 0,
     vy: 0
   }
@@ -97,7 +101,7 @@ function draw() {
       fill(0,0,255);
       rect(width/2, height-height/4, width/5, height/5);
       fill(0);
-      textSize(width/10);
+      textSize(width/20+height/20);
       textAlign(CENTER,CENTER);
       text("Play", width/2, height-height/4);
       pop();
@@ -117,7 +121,7 @@ function draw() {
       fill(0,0,255);
       rect(width/2, height-height/4, width/5, height/5);
       fill(0);
-      textSize(width/15);
+      textSize(width/30+height/30);
       textAlign(CENTER,CENTER);
       text("Fight!", width/2, height-height/4);
       pop();
@@ -134,7 +138,7 @@ function draw() {
       rectMode(CENTER);
       rect(width/2,height/4+height/6,width-width/10,height/2-height/20);
       fill(0);
-      textSize(width/40+height/40);
+      textSize(width/40+height/60);
       textAlign(CENTER,CENTER);
       text("You are a powerful wizard who can cast spells", width/2, height/4);
       text("A killer robot stands in your way with giant guns", width/2, height/4+height/18);
@@ -228,6 +232,15 @@ function draw() {
         textSize(width/40+height/40);
         text("target" + " received " + "number" + " effect " + " from " + "char" + "'s " + "abilityName" + "!", width/2, height-height/4);
         pop();
+        // check if the player wins or loses
+        if (player.health <= 0) {
+          victory = -1;
+          whichScreen = 4;
+        }
+        if (enemy.health <= 0) {
+          victory = 1;
+          whichScreen = 4;
+        }
       } else {
         if (whoseTurn === 1) {
           textTimer = millis();
@@ -246,7 +259,6 @@ function draw() {
       break;
     case 3: // Mini game
     // create a white canvas for minigame
-    console.log(targets);
       push();
       rectMode(CENTER);
       strokeWeight(5);
@@ -260,18 +272,18 @@ function draw() {
             spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
             for (var i = 0; i < targets.length; i++) {
               targets[i].index = targets.indexOf(targets[i]);
-              targets[i].clicked();
               targets[i].move();
               targets[i].display();
             }
             for (var i = 0; i < obstacles.length; i++) {
               obstacles[i].index = obstacles.indexOf(obstacles[i]);
-              obstacles[i].clicked();
               obstacles[i].move();
               obstacles[i].display();
             }
           } else { // go to effect of ability
             // the ability's effect happen here before going to effect text
+            obstacles = [];
+            targets = [];
             textTimer = millis();
             subScreen = 2;
             whichScreen = 2;
@@ -280,6 +292,28 @@ function draw() {
         case -1:
         if (millis() - minigameTimer < minigameTimerAmount) {
             spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+            // move and display the player
+            player.vx = 0;
+            player.vy = 0;
+            if (keyIsDown(87)) {
+              player.vy = -player.speed;
+            }
+            if (keyIsDown(65)) {
+              player.vx = -player.speed;
+            }
+            if (keyIsDown(83)) {
+              player.vy = player.speed;
+            }
+            if (keyIsDown(68)) {
+              player.vx = player.speed;
+            }
+            player.x += player.vx;
+            player.y += player.vy;
+            push();
+            fill(0,0,255);
+            ellipseMode(CENTER);
+            ellipse(player.x, player.y, player.size);
+            pop();
             for (var i = 0; i < bullets.length; i++) {
               bullets[i].index = bullets.indexOf(bullets[i]);
               bullets[i].move();
@@ -288,6 +322,8 @@ function draw() {
             }
           } else { // go to effect of ability
             // the ability's effect happen here before going to effect text
+            bullets = [];
+            bulletHits = 0;
             textTimer = millis();
             subScreen = 2;
             whichScreen = 2;
@@ -297,8 +333,27 @@ function draw() {
       }
       break;
     case 4: // Game over
-      // see who won through switch, then present either happy or sad ending
-
+      push();
+      textAlign(CENTER, CENTER);
+      textSize(width/40+height/40);
+      fill(255);
+      // see who won then present either happy or sad ending
+      if (victory === -1) {
+        text("You lost!", width/2, height/5);
+      }
+      if (victory === 1) {
+        text("You won!", width/2, height/5);
+      }
+      // play again button
+      rectMode(CENTER);
+      noStroke();
+      fill(0,0,255);
+      rect(width/2, height-height/4, width/5, height/5);
+      fill(0);
+      textSize(width/50+height/50);
+      textAlign(CENTER,CENTER);
+      text("Play Again", width/2, height-height/4);
+      pop();
       break;
     default:
   }
@@ -334,8 +389,11 @@ function mousePressed() {
       }
       break;
     case 3:
-      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-        // move to screen 1
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].clicked();
+      }
+      for (var i = 0; i < obstacles.length; i++) {
+        obstacles[i].clicked();
       }
       break;
     case 4:
@@ -353,26 +411,18 @@ function mousePressed() {
 // create objects in the mini games
 function spawn() {
   if (millis() - spawnTimer > spawnTimerAmount) {
-    let yPlace = floor(random(0,2)); // if object appears on top or bottom
-    let yObject;
-    if (yPlace === 0) {
-      yObject = 0;
-    }
-    if (yPlace === 1) {
-      yObject = height;
-    }
     if (whoseTurn === 1) {
       let whichObject = floor(random(0,2));
       if (whichObject === 0) {
-        let newTarget = new Target(random(0, width), yObject, random(width/15, width/8), random(height/15, height/8), random(8, 12), random(8, 12), targets.length);
+        let newTarget = new Target(random(0, width), 0, random(width/15, width/8), random(-12, 12), random(8, 12), targets.length);
         targets.push(newTarget);
       } else if (whichObject === 1) {
-        let newObstacle = new Obstacle(random(0, width), yObject, random(width/15, width/8), random(height/15, height/8), random(8, 12), random(8, 12), obstacles.length);
+        let newObstacle = new Obstacle(random(0, width), 0, random(width/15, width/8), random(-12, 12), random(8, 12), obstacles.length);
         obstacles.push(newObstacle);
       }
     }
     if (whoseTurn === -1) {
-      let newBullet = new Bullet(random(0, width), yObject, random(width/15, width/8), random(height/15, height/8), random(8, 12), random(8, 12), bullets.length);
+      let newBullet = new Bullet(random(0, width), 0, random(width/15, width/8), random(-12, 12), random(8, 12), bullets.length);
       bullets.push(newBullet);
     }
   spawnTimer = millis();

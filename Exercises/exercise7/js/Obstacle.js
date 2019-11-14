@@ -4,12 +4,20 @@
 
 
 class Obstacle extends MinigameObj {
-  constructor(x, y, sizeX, sizeY, speedX, speedY) {
+  constructor(x, y, size, speedX, speedY) {
     // To MinigameObj
-    super(x, y, sizeX, sizeY, speedX, speedY);
+    super(x, y, size, speedX, speedY);
   }
+  // clicked
+  //
+  // if this is clicked
   clicked() {
     // if the player clicks on it, they lose targetsHit
+    let d = dist(this.x, this.y, mouseX, mouseY);
+    if (d < this.size) {
+      targetsHit--;
+      var removed = obstacles.splice(this.index, 1);
+    }
   }
   // display
   //
@@ -17,8 +25,7 @@ class Obstacle extends MinigameObj {
   display() {
     push();
     fill(255,0,0);
-    console.log("obst");
-    ellipse(this.x, this.y, this.sizeX, this.sizeY);
+    ellipse(this.x, this.y, this.size);
     pop();
     // if (x < 0 || x > width || y < 0 || y > height) {
     //   var removed = obstacles.splice(this.index, 1);

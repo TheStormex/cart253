@@ -17,7 +17,7 @@ class Ability {
     this.sizeY = height/3;
     // The name
     this.name = name;
-    // The ability's effect
+    // The ability's effect text (should it appear anywhere)
     this.effect = effect;
   }
   displayInventory() {

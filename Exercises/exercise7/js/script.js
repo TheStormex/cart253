@@ -23,8 +23,8 @@ let chosenAbility;
 // Array of enemy bullets
 let bullets = [];
 
-// How many bullets the player ran into
-let bulletHits = 0;
+// How many bullets the player ran into / targets the player clicked on - obstacles
+let minigameHits = 0;
 
 // Array of targets the player must hit in the mini game
 let targets = [];
@@ -32,11 +32,11 @@ let targets = [];
 // Array of obstacles the player must not hit in the mini game
 let obstacles = [];
 
-// How many targets the player clicked on - obstacles clicked on
-let targetsHit = 0;
-
 // Array of abilities the player currently has
 let abilitiesHave = [];
+
+// Array of abilities the enemy has
+let enemyAbilitiesHave = [];
 
 // The player object
 let player;
@@ -63,8 +63,8 @@ function setup() {
 
   player = {
     name: "Player",
-    health: 50,
-    maxHealth: 50,
+    health: 20,
+    maxHealth: 20,
     x: width/2,
     y: height/2,
     size: width/20+height/20,
@@ -80,10 +80,18 @@ function setup() {
   let abilityX = width/10; // create our five starting abilities
   for (var i = 0; i < 5; i++) {
     let ability;
-    let newAbility = new Ability(abilityX, "Fire Spear", "Deal damage");
+    let newAbility = new Ability(abilityX, "Fire Spear", "Deal damage", player, enemy, "damage", 1);
     abilitiesHave.push(newAbility);
     abilityX += width/5;
   }
+
+  // create the list of enemy abilities
+  let newEnemyAbility = new Ability(0, "Neutron Beam", "deal damage", enemy, player, "damage", 1);
+  enemyAbilitiesHave.push(newEnemyAbility);
+  newEnemyAbility = new Ability(0, "BulletStorm", "deal damage", enemy, player, "damage", 1);
+  enemyAbilitiesHave.push(newEnemyAbility);
+  newEnemyAbility = new Ability(0, "Barrage!", "deal damage", enemy, player, "damage", 1);
+  enemyAbilitiesHave.push(newEnemyAbility);
 }
 
 // draw()
@@ -114,7 +122,7 @@ function draw() {
       pop();
       break;
     case 1: // Instructions
-      // Play button
+      // Fight! button
       push();
       rectMode(CENTER);
       noStroke();
@@ -217,7 +225,7 @@ function draw() {
           fill(0);
           textAlign(CENTER,CENTER);
           textSize(width/30+height/30);
-          text("char" + " used " + "abilityName" + " on " + "target" + "!", width/2, height-height/4);
+          text(chosenAbility.user.name + " used " + chosenAbility.name + " on " + chosenAbility.targets.name + "!", width/2, height-height/4);
           pop();
         } else {
             minigameTimer = millis();
@@ -230,8 +238,9 @@ function draw() {
         fill(0);
         textAlign(CENTER,CENTER);
         textSize(width/40+height/40);
-        text("target" + " received " + "number" + " effect " + " from " + "char" + "'s " + "abilityName" + "!", width/2, height-height/4);
+        text(chosenAbility.targets.name + " received " + chosenAbility.totalAmount + " " + chosenAbility.effect + " from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
         pop();
+      } else {
         // check if the player wins or loses
         if (player.health <= 0) {
           victory = -1;
@@ -241,14 +250,17 @@ function draw() {
           victory = 1;
           whichScreen = 4;
         }
-      } else {
         if (whoseTurn === 1) {
+          enemyChooseAbility();
           textTimer = millis();
+          player.x = width/2;
+          player.y = height/2;
           whoseTurn = -1;
           subScreen = 1;
         }
         else if (whoseTurn === -1) {
           textTimer = millis();
+          chosenAbility = 0;
           whoseTurn = 1;
           subScreen = 0;
         }
@@ -285,6 +297,8 @@ function draw() {
             obstacles = [];
             targets = [];
             textTimer = millis();
+            abilityHappens();
+            minigameHits = 0;
             subScreen = 2;
             whichScreen = 2;
           }
@@ -323,8 +337,9 @@ function draw() {
           } else { // go to effect of ability
             // the ability's effect happen here before going to effect text
             bullets = [];
-            bulletHits = 0;
             textTimer = millis();
+            abilityHappens();
+            minigameHits = 0;
             subScreen = 2;
             whichScreen = 2;
           }
@@ -397,8 +412,9 @@ function mousePressed() {
       }
       break;
     case 4:
-      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-        // move to screen 1
+      if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
+        // move to screen 2
+        whichScreen = 2;
       }
       break;
     default:
@@ -414,17 +430,50 @@ function spawn() {
     if (whoseTurn === 1) {
       let whichObject = floor(random(0,2));
       if (whichObject === 0) {
-        let newTarget = new Target(random(0, width), 0, random(width/15, width/8), random(-12, 12), random(8, 12), targets.length);
+        let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), targets.length);
         targets.push(newTarget);
       } else if (whichObject === 1) {
-        let newObstacle = new Obstacle(random(0, width), 0, random(width/15, width/8), random(-12, 12), random(8, 12), obstacles.length);
+        let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), obstacles.length);
         obstacles.push(newObstacle);
       }
     }
     if (whoseTurn === -1) {
-      let newBullet = new Bullet(random(0, width), 0, random(width/15, width/8), random(-12, 12), random(8, 12), bullets.length);
+      let newBullet = new Bullet(random(0, width), 0, random(width/40+height/40, width/30+height/30), random(-12, 12), random(15, 18), bullets.length);
       bullets.push(newBullet);
     }
   spawnTimer = millis();
+  }
+}
+
+// enemyChooseAbility()
+//
+// the enemy randomly chooses which ability to use
+function enemyChooseAbility() {
+  let enemyAbility = floor(random(0, 3));
+  chosenAbility = enemyAbilitiesHave[enemyAbility];
+}
+
+// abilityHappens()
+//
+// The ability's effect take place
+function abilityHappens() {
+  let whichEffect;
+  let abilityTargets;
+  whichEffect = chosenAbility.effect;
+  abilityTargets = chosenAbility.targets;
+  chosenAbility.totalAmount = chosenAbility.amount*minigameHits;
+  switch (whichEffect) {
+    case "damage":
+      abilityTargets.health -= chosenAbility.totalAmount;
+      abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
+      break;
+    case "heal":
+      abilityTargets.health += chosenAbility.totalAmount;
+      abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
+      break;
+    case "stun":
+
+      break;
+    default:
   }
 }

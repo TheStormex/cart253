@@ -12,7 +12,7 @@ class Bullet extends MinigameObj {
     // if touch player, player loses life
     let d = dist(this.x, this.y, player.x, player.y);
     if (d < this.size) {
-      bulletHits++;
+      minigameHits++;
       var removed = bullets.splice(this.index, 1);
     }
   }

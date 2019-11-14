@@ -8,7 +8,7 @@ class Ability {
   //
   // Sets the initial values for the Ability's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, name, effect) {
+  constructor(x, name, text, user, targets, effect, amount) {
     // Position
     this.x = x;
     this.y = height/2+height/3.2;
@@ -18,7 +18,17 @@ class Ability {
     // The name
     this.name = name;
     // The ability's effect text (should it appear anywhere)
+    this.text = text;
+    // Whose inventory is this ability in
+    this.user = user;
+    // Who this ability can target
+    this.targets = targets;
+    // what effect this ability has
     this.effect = effect;
+    // how much of the effect per minigame hit
+    this.amount = amount;
+    // how much total effect
+    this.totalAmount = 0;
   }
   displayInventory() {
     push();
@@ -31,7 +41,7 @@ class Ability {
     textAlign(CENTER,CENTER);
     text(this.name, this.x , this.y-this.y/8);
     textSize(width/60+height/60);
-    text(this.effect, this.x, this.y+height/20);
+    text(this.text, this.x, this.y+height/20);
     pop();
   }
 

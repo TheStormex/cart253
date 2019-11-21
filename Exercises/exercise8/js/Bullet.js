@@ -16,6 +16,20 @@ class Bullet extends MinigameObj {
       var removed = bullets.splice(this.index, 1);
     }
   }
+  bounce() { // if this bullet bounces on walls run this code
+    if (this.x-this.size/2 <= 0) {
+      this.x = this.size/2;
+    }
+    if (this.x+this.size/2 > width) {
+      this.x = width-this.size/2;
+    }
+    if (this.y-this.size/2 < 0) {
+      this.y = this.size/2;
+    }
+    if (this.y+this.size/2 > height) {
+      this.y = height-this.size/2;
+    }
+  }
   // display
   //
   // display the bullet

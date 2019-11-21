@@ -32,10 +32,23 @@ let targets = [];
 // Array of obstacles the player must not hit in the mini game
 let obstacles = [];
 
-// Array of abilities the player currently has
+// Array of abilities the player currently has in the inventory
 let abilitiesHave = [];
 
-// Array of abilities the enemy has
+// Array of abilities the player currently has in the deck
+let abilitiesPlayerDeck = [];
+
+// Array of abilities the player can get
+let fireSpear;
+let cleanse;
+let paralyse;
+let shield;
+let curse;
+let abilitiesPlayerAll = [];
+
+let abilityX = 0;
+
+// Array of abilities the enemy can get
 let enemyAbilitiesHave = [];
 
 // The player object
@@ -59,7 +72,7 @@ let spawnTimerAmount = 80; // 2/25 of a second
 //
 // Sets up a canvas
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth-windowWidth/50, windowHeight-windowHeight/50);
 
   player = {
     name: "Player",
@@ -81,32 +94,44 @@ function setup() {
     incoming: 0,
     stun: false
   }
-  let abilityX = width/10; // create our five starting abilities
-  //for (var i = 0; i < 5; i++) {
-    let ability;
-    let newAbility = new Ability(abilityX, "Fire Spear", "Deal damage", player, enemy, "damage", 10, color(255,0,0));
-    abilitiesHave.push(newAbility);
-    abilityX += width/5;
-    newAbility = new Ability(abilityX, "Cleanse", "Heal self", player, player, "heal", 8, color(0,255,255));
-    abilitiesHave.push(newAbility);
-    abilityX += width/5;
-    newAbility = new Ability(abilityX, "Paralyse", "Stun", player, enemy, "stun", 1, color(255,255,0));
-    abilitiesHave.push(newAbility);
-    abilityX += width/5;
-    newAbility = new Ability(abilityX, "Shield", "Protect self", player, player, "incoming", -5, color(0,255,0));
-    abilitiesHave.push(newAbility);
-    abilityX += width/5;
-    newAbility = new Ability(abilityX, "Curse", "Weaken enemy", player, enemy, "incoming", 5, color(255,0,255));
-    abilitiesHave.push(newAbility);
-    abilityX += width/5;
-  //}
 
+  // Create the player's five abilities
+  fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", 10, playerMinigame, color(255,0,0));
+  cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", 8, playerMinigame, color(0,255,255));
+  paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", 10, playerMinigame, color(255,255,0));
+  shield = new Ability("Shield", "Protect self", player, player, "% incoming", -5, playerMinigame, color(0,255,0));
+  curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", 5, playerMinigame, color(255,0,255));
+  abilitiesPlayerAll = [fireSpear, cleanse, paralyse, shield, curse];
+
+  // Create the player's deck of abilities (20)
+  for (var i = 0; i < 8; i++) {
+    abilitiesPlayerDeck.push(fireSpear);
+  }
+  for (var i = 0; i < 3; i++) {
+    abilitiesPlayerDeck.push(cleanse);
+  }
+  for (var i = 0; i < 3; i++) {
+    abilitiesPlayerDeck.push(paralyse);
+  }
+  for (var i = 0; i < 3; i++) {
+    abilitiesPlayerDeck.push(shield);
+  }
+  for (var i = 0; i < 3; i++) {
+    abilitiesPlayerDeck.push(curse);
+  }
+  // Shuffle the player's deck
+  abilitiesPlayerDeck = shuffle(abilitiesPlayerDeck);
+  // The player draws the 5 card starting hand
+  for (var i = 0; i < 5; i++) {
+    abilitiesHave.push(abilitiesPlayerDeck[i]);
+    abilitiesPlayerDeck.splice(abilitiesPlayerDeck[i], 1);
+  }
   // create the list of enemy abilities
-  let newEnemyAbility = new Ability(0, "Neutron Beam", "deal damage", enemy, player, "damage", 10);
+  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", 10, enemyBulletStormMinigame, color(0));
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability(0, "BulletStorm", "deal damage", enemy, player, "damage", 10);
+  newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", 10, enemyBulletStormMinigame, color(0));
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability(0, "Barrage!", "deal damage", enemy, player, "damage", 10);
+  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", 3, enemyBulletStormMinigame, color(0));
   enemyAbilitiesHave.push(newEnemyAbility);
 }
 
@@ -169,7 +194,7 @@ function draw() {
       text("Choose an ability in your inventory to use it", width/2, height/4+(height/18)*2);
       text("Click on green circles and avoid red ones", width/2, height/4+(height/18)*3);
       text("Control your vessel to dodge the bullets", width/2, height/4+(height/18)*4);
-      text("You will get another spell every turn", width/2, height/4+(height/18)*5);
+      text("You will get another ability every turn", width/2, height/4+(height/18)*5);
       text("Blow up the robot with your magic! Good luck!", width/2, height/4+(height/18)*6);
       pop();
       break;
@@ -240,7 +265,7 @@ function draw() {
         case 0: // choose ability
         // each of the five abilities the player can use
         for (var i = 0; i < abilitiesHave.length; i++) {
-          abilitiesHave[i].displayInventory();
+          abilitiesHave[i].displayInventory(i);
         }
           break;
         case 1: // character used X on Y
@@ -306,73 +331,18 @@ function draw() {
       fill(255);
       rect(width/2,height/2,width,height);
       pop();
-      switch (whoseTurn) {
-        case 1:
-          if (millis() - minigameTimer < minigameTimerAmount) {
-            spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
-            for (var i = 0; i < targets.length; i++) {
-              targets[i].index = targets.indexOf(targets[i]);
-              targets[i].move();
-              targets[i].display();
-            }
-            for (var i = 0; i < obstacles.length; i++) {
-              obstacles[i].index = obstacles.indexOf(obstacles[i]);
-              obstacles[i].move();
-              obstacles[i].display();
-            }
-          } else { // go to effect of ability
-            // the ability's effect happen here before going to effect text
-            obstacles = [];
-            targets = [];
-            textTimer = millis();
-            abilityHappens();
-            minigameHits = 0;
-            subScreen = 2;
-            whichScreen = 2;
-          }
-          break;
-        case -1:
-        if (millis() - minigameTimer < minigameTimerAmount) {
-            spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
-            // move and display the player
-            player.vx = 0;
-            player.vy = 0;
-            if (keyIsDown(87)) {
-              player.vy = -player.speed;
-            }
-            if (keyIsDown(65)) {
-              player.vx = -player.speed;
-            }
-            if (keyIsDown(83)) {
-              player.vy = player.speed;
-            }
-            if (keyIsDown(68)) {
-              player.vx = player.speed;
-            }
-            player.x += player.vx;
-            player.y += player.vy;
-            push();
-            fill(0,0,255);
-            ellipseMode(CENTER);
-            ellipse(player.x, player.y, player.size);
-            pop();
-            for (var i = 0; i < bullets.length; i++) {
-              bullets[i].index = bullets.indexOf(bullets[i]);
-              bullets[i].move();
-              bullets[i].touchPlayer();
-              bullets[i].display();
-            }
-          } else { // go to effect of ability
-            // the ability's effect happen here before going to effect text
-            bullets = [];
-            textTimer = millis();
-            abilityHappens();
-            minigameHits = 0;
-            subScreen = 2;
-            whichScreen = 2;
-          }
-          break;
-        default:
+      if (millis() - minigameTimer < minigameTimerAmount) {
+        chosenAbility.minigame();
+      } else { // go to effect of ability
+        // the ability's effect happen here before going to effect text
+        obstacles = [];
+        targets = [];
+        bullets = [];
+        textTimer = millis();
+        abilityHappens();
+        minigameHits = 0;
+        subScreen = 2;
+        whichScreen = 2;
       }
       break;
     case 4: // Game over
@@ -423,8 +393,23 @@ function mousePressed() {
       if (subScreen === 0) { // if we are choosing to click on an ability
         for (var i = 0; i < abilitiesHave.length; i++) {
           if (mouseX > abilitiesHave[i].x-abilitiesHave[i].sizeX/2 && mouseX < abilitiesHave[i].x+abilitiesHave[i].sizeX/2 && mouseY > abilitiesHave[i].y-abilitiesHave[i].sizeY/2 && mouseY < abilitiesHave[i].y+abilitiesHave[i].sizeY/2) {
-            // choose this ability and go to text
+            // choose this ability, add another card to hand and go to text
             chosenAbility = abilitiesHave[i];
+            console.log(abilitiesHave[0]);
+            console.log(abilitiesHave[1]);
+            console.log(abilitiesHave[2]);
+            console.log(abilitiesHave[3]);
+            console.log(abilitiesHave[4]);
+            console.log("NEW");
+            abilitiesHave.splice(i, 1);
+            abilitiesHave.push(abilitiesPlayerDeck[0]);
+            abilitiesPlayerDeck.splice(0, 1);
+            console.log(abilitiesHave[0]);
+            console.log(abilitiesHave[1]);
+            console.log(abilitiesHave[2]);
+            console.log(abilitiesHave[3]);
+            console.log(abilitiesHave[4]);
+            console.log("DONE");
             textTimer = millis();
             subScreen = 1;
           }
@@ -502,21 +487,11 @@ function abilityHappens() {
       abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
       break;
     case "stun":
-      let stunChance = 0;
-      switch (chosenAbility.user) {
-        case player:
-          stunChance = 10;
-          break;
-        case enemy:
-          stunChance = 3;
-          break;
-        default:
-      }
-      if (minigameHits >= stunChance) {
+      if (minigameHits >= chosenAbility.amount) {
         abilityTargets.stun = true;
       }
       break;
-    case "incoming":
+    case "% incoming":
       abilityTargets.incoming += chosenAbility.totalAmount;
       break;
     default:
@@ -543,4 +518,95 @@ function goToEnemyTurn() {
   player.y = height/2;
   whoseTurn = -1;
   subScreen = 1;
+}
+
+// playerMinigame()
+//
+// the player's minigame
+function playerMinigame() {
+  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  for (var i = 0; i < targets.length; i++) {
+    targets[i].index = targets.indexOf(targets[i]);
+    targets[i].move();
+    targets[i].display();
+  }
+  for (var i = 0; i < obstacles.length; i++) {
+    obstacles[i].index = obstacles.indexOf(obstacles[i]);
+    obstacles[i].move();
+    obstacles[i].display();
+  }
+}
+
+
+// enemyBulletStormMinigame
+//
+// minigame for bulletStorm
+function enemyBulletStormMinigame() {
+  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  enemyMinigamePlayer();
+  // move and display all bullets and check if they touch the player
+  for (var i = 0; i < bullets.length; i++) {
+    bullets[i].index = bullets.indexOf(bullets[i]);
+    bullets[i].move();
+    bullets[i].display();
+    bullets[i].touchPlayer();
+  }
+}
+
+// enemyNeutronBeamMinigame()
+//
+// minigame for neutron beam
+function enemyNeutronBeamMinigame() {
+  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  enemyMinigamePlayer();
+  // move and display all bullets and check if they touch the player
+  for (var i = 0; i < bullets.length; i++) {
+    bullets[i].index = bullets.indexOf(bullets[i]);
+    bullets[i].move();
+    bullets[i].bounce();
+    bullets[i].display();
+    bullets[i].touchPlayer();
+  }
+}
+
+// enemyMinigamePlayer()
+//
+// Moving and displaying the player in enemy minigames
+function enemyMinigamePlayer() {
+  // move and display the player
+  player.vx = 0;
+  player.vy = 0;
+  if (keyIsDown(87)) {
+    player.vy = -player.speed;
+  }
+  if (keyIsDown(65)) {
+    player.vx = -player.speed;
+  }
+  if (keyIsDown(83)) {
+    player.vy = player.speed;
+  }
+  if (keyIsDown(68)) {
+    player.vx = player.speed;
+  }
+  player.x += player.vx;
+  player.y += player.vy;
+  // Make sure the player does not go outside the borders
+  if (player.x-player.size/2 <= 0) {
+    player.x = player.size/2;
+  }
+  if (player.x+player.size/2 > width) {
+    player.x = width-player.size/2;
+  }
+  if (player.y-player.size/2 < 0) {
+    player.y = player.size/2;
+  }
+  if (player.y+player.size/2 > height) {
+    player.y = height-player.size/2;
+  }
+  // Draw the player
+  push();
+  fill(0,0,255);
+  ellipseMode(CENTER);
+  ellipse(player.x, player.y, player.size);
+  pop();
 }

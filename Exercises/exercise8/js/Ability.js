@@ -8,9 +8,9 @@ class Ability {
   //
   // Sets the initial values for the Ability's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, name, text, user, targets, effect, amount, color) {
-    // Position
-    this.x = x;
+  constructor(name, text, user, targets, effect, amount, minigame, color) {
+    // Position in the inventory (if in the inventory)
+    this.x = width/10;
     this.y = height/2+height/3.2;
     // Size
     this.sizeX = width/6;
@@ -29,13 +29,16 @@ class Ability {
     this.amount = amount;
     // how much total effect
     this.totalAmount = 0;
+    // the minigame of this ability
+    this.minigame = minigame;
     // the color of the card
     this.color = color;
   }
-  displayInventory() {
+  displayInventory(i) {
     push();
     rectMode(CENTER);
     noStroke();
+    this.x = width/10 + width/5 * i;
     fill(this.color);
     rect(this.x, this.y, this.sizeX, this.sizeY);
     fill(0);

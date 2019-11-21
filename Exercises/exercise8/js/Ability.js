@@ -8,7 +8,7 @@ class Ability {
   //
   // Sets the initial values for the Ability's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, name, text, user, targets, effect, amount) {
+  constructor(x, name, text, user, targets, effect, amount, color) {
     // Position
     this.x = x;
     this.y = height/2+height/3.2;
@@ -29,12 +29,14 @@ class Ability {
     this.amount = amount;
     // how much total effect
     this.totalAmount = 0;
+    // the color of the card
+    this.color = color;
   }
   displayInventory() {
     push();
     rectMode(CENTER);
     noStroke();
-    fill(0,255,255);
+    fill(this.color);
     rect(this.x, this.y, this.sizeX, this.sizeY);
     fill(0);
     textSize(width/50+height/50);

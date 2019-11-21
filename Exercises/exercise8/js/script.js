@@ -63,8 +63,10 @@ function setup() {
 
   player = {
     name: "Player",
-    health: 20,
-    maxHealth: 20,
+    health: 200,
+    maxHealth: 200,
+    incoming: 0,
+    stun: false,
     x: width/2,
     y: height/2,
     size: width/20+height/20,
@@ -74,23 +76,37 @@ function setup() {
   }
   enemy = {
     name: "Enemy",
-    health: 50,
-    maxHealth: 50
+    health: 500,
+    maxHealth: 500,
+    incoming: 0,
+    stun: false
   }
   let abilityX = width/10; // create our five starting abilities
-  for (var i = 0; i < 5; i++) {
+  //for (var i = 0; i < 5; i++) {
     let ability;
-    let newAbility = new Ability(abilityX, "Fire Spear", "Deal damage", player, enemy, "damage", 1);
+    let newAbility = new Ability(abilityX, "Fire Spear", "Deal damage", player, enemy, "damage", 10, color(255,0,0));
     abilitiesHave.push(newAbility);
     abilityX += width/5;
-  }
+    newAbility = new Ability(abilityX, "Cleanse", "Heal self", player, player, "heal", 8, color(0,255,255));
+    abilitiesHave.push(newAbility);
+    abilityX += width/5;
+    newAbility = new Ability(abilityX, "Paralyse", "Stun", player, enemy, "stun", 1, color(255,255,0));
+    abilitiesHave.push(newAbility);
+    abilityX += width/5;
+    newAbility = new Ability(abilityX, "Shield", "Protect self", player, player, "incoming", -5, color(0,255,0));
+    abilitiesHave.push(newAbility);
+    abilityX += width/5;
+    newAbility = new Ability(abilityX, "Curse", "Weaken enemy", player, enemy, "incoming", 5, color(255,0,255));
+    abilitiesHave.push(newAbility);
+    abilityX += width/5;
+  //}
 
   // create the list of enemy abilities
-  let newEnemyAbility = new Ability(0, "Neutron Beam", "deal damage", enemy, player, "damage", 1);
+  let newEnemyAbility = new Ability(0, "Neutron Beam", "deal damage", enemy, player, "damage", 10);
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability(0, "BulletStorm", "deal damage", enemy, player, "damage", 1);
+  newEnemyAbility = new Ability(0, "BulletStorm", "deal damage", enemy, player, "damage", 10);
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability(0, "Barrage!", "deal damage", enemy, player, "damage", 1);
+  newEnemyAbility = new Ability(0, "Barrage!", "deal damage", enemy, player, "damage", 10);
   enemyAbilitiesHave.push(newEnemyAbility);
 }
 
@@ -185,6 +201,10 @@ function draw() {
       fill(255,0,0);
       let lifeBarSizePlayer = map(player.health*100/player.maxHealth,0,100,0,width-width/4);
       rect(width/5, height/2+height/30, lifeBarSizePlayer, height/10);
+      textAlign(CENTER,CENTER);
+      textSize(width/30);
+      fill(0);
+      text(player.health + "/" + player.maxHealth, width/2, height/2+height/10);
       pop();
       // the enemy avatar
       push()
@@ -211,6 +231,10 @@ function draw() {
       fill(255,0,0);
       let lifeBarSizeEnemy = map(enemy.health*100/enemy.maxHealth,0,100, 0,width/8);
       rect(width/2-width/16, height/6, lifeBarSizeEnemy, height/20);
+      textAlign(CENTER,CENTER);
+      textSize(width/60);
+      fill(0);
+      text(enemy.health + "/" + enemy.maxHealth, width/2, height/6+height/30);
       pop();
       switch (subScreen) {
         case 0: // choose ability
@@ -250,19 +274,23 @@ function draw() {
           victory = 1;
           whichScreen = 4;
         }
-        if (whoseTurn === 1) {
-          enemyChooseAbility();
-          textTimer = millis();
-          player.x = width/2;
-          player.y = height/2;
-          whoseTurn = -1;
-          subScreen = 1;
+        if (whoseTurn === 1) { // if it is the player's turn
+          if (!enemy.stun) { // if enemy is not stunned, go to enemy's turn
+            goToEnemyTurn();
+          }
+          else if (enemy.stun) { // if enemy is stunned, go to player's turn
+            enemy.stun = false;
+            goToPlayerTurn();
+          }
         }
-        else if (whoseTurn === -1) {
-          textTimer = millis();
-          chosenAbility = 0;
-          whoseTurn = 1;
-          subScreen = 0;
+        else if (whoseTurn === -1) { // if it is the enemy's turn
+          if (!player.stun) { // if player is not stunned, go to player's turn
+            goToPlayerTurn();
+          }
+          else if (player.stun) { // if player is stunned, go to enemy's turn
+            player.stun = false;
+            goToEnemyTurn();
+          }
         }
       }
           break;
@@ -464,7 +492,9 @@ function abilityHappens() {
   chosenAbility.totalAmount = chosenAbility.amount*minigameHits;
   switch (whichEffect) {
     case "damage":
+      chosenAbility.totalAmount = round(chosenAbility.totalAmount + chosenAbility.totalAmount*0.01*abilityTargets.incoming);
       abilityTargets.health -= chosenAbility.totalAmount;
+      abilityTargets.incoming = 0; // set incoming back to 0
       abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
       break;
     case "heal":
@@ -472,8 +502,45 @@ function abilityHappens() {
       abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
       break;
     case "stun":
-
+      let stunChance = 0;
+      switch (chosenAbility.user) {
+        case player:
+          stunChance = 10;
+          break;
+        case enemy:
+          stunChance = 3;
+          break;
+        default:
+      }
+      if (minigameHits >= stunChance) {
+        abilityTargets.stun = true;
+      }
+      break;
+    case "incoming":
+      abilityTargets.incoming += chosenAbility.totalAmount;
       break;
     default:
   }
+}
+
+// goToPlayerTurn()
+//
+// Go from the enemy's turn to the player's turn
+function goToPlayerTurn() {
+  textTimer = millis();
+  chosenAbility = 0;
+  whoseTurn = 1;
+  subScreen = 0;
+}
+
+// goToEnemyTurn()
+//
+// Go from the player's turn to the enemy's turn
+function goToEnemyTurn() {
+  enemyChooseAbility();
+  textTimer = millis();
+  player.x = width/2;
+  player.y = height/2;
+  whoseTurn = -1;
+  subScreen = 1;
 }

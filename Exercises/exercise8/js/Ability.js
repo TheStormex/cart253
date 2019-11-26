@@ -48,6 +48,7 @@ class Ability {
     textSize(width/60+height/60);
     text(this.text, this.x, this.y+height/20);
     pop();
+    // console.log(this.x);
   }
 
 }

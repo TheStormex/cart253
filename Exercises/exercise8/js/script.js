@@ -126,6 +126,7 @@ function setup() {
     abilitiesHave.push(abilitiesPlayerDeck[i]);
     abilitiesPlayerDeck.splice(abilitiesPlayerDeck[i], 1);
   }
+  console.log(abilitiesHave);
   // create the list of enemy abilities
   let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", 10, enemyBulletStormMinigame, color(0));
   enemyAbilitiesHave.push(newEnemyAbility);
@@ -266,6 +267,10 @@ function draw() {
         // each of the five abilities the player can use
         for (var i = 0; i < abilitiesHave.length; i++) {
           abilitiesHave[i].displayInventory(i);
+          console.log("One " + i + abilitiesHave[i].name + " " + abilitiesHave[i].x);
+        }
+        for (var i = 0; i < abilitiesHave.length; i++) {
+          console.log("Two " + i + abilitiesHave[i].name + " " + abilitiesHave[i].x);
         }
           break;
         case 1: // character used X on Y
@@ -395,21 +400,21 @@ function mousePressed() {
           if (mouseX > abilitiesHave[i].x-abilitiesHave[i].sizeX/2 && mouseX < abilitiesHave[i].x+abilitiesHave[i].sizeX/2 && mouseY > abilitiesHave[i].y-abilitiesHave[i].sizeY/2 && mouseY < abilitiesHave[i].y+abilitiesHave[i].sizeY/2) {
             // choose this ability, add another card to hand and go to text
             chosenAbility = abilitiesHave[i];
-            console.log(abilitiesHave[0]);
-            console.log(abilitiesHave[1]);
-            console.log(abilitiesHave[2]);
-            console.log(abilitiesHave[3]);
-            console.log(abilitiesHave[4]);
-            console.log("NEW");
+            // console.log(abilitiesHave[0]);
+            // console.log(abilitiesHave[1]);
+            // console.log(abilitiesHave[2]);
+            // console.log(abilitiesHave[3]);
+            // console.log(abilitiesHave[4]);
+            // console.log("NEW");
             abilitiesHave.splice(i, 1);
             abilitiesHave.push(abilitiesPlayerDeck[0]);
             abilitiesPlayerDeck.splice(0, 1);
-            console.log(abilitiesHave[0]);
-            console.log(abilitiesHave[1]);
-            console.log(abilitiesHave[2]);
-            console.log(abilitiesHave[3]);
-            console.log(abilitiesHave[4]);
-            console.log("DONE");
+            // console.log(abilitiesHave[0]);
+            // console.log(abilitiesHave[1]);
+            // console.log(abilitiesHave[2]);
+            // console.log(abilitiesHave[3]);
+            // console.log(abilitiesHave[4]);
+            // console.log("DONE");
             textTimer = millis();
             subScreen = 1;
           }

@@ -7,6 +7,8 @@ class Bullet extends MinigameObj {
   constructor(x, y, size, vx, vy) {
     // To MinigameObj
     super(x, y, size, vx, vy);
+    // If this moves in sine wave, keep track of angle
+    this.waveAngle = 0;
   }
   touchPlayer() {
     // if touch player, player loses life
@@ -34,6 +36,11 @@ class Bullet extends MinigameObj {
       this.vy *= -1;
     }
   }
+  wave() { // if this bullet moves in a sine wave motion
+    this.waveAngle += 5;
+    this.vx = sin(this.waveAngle*0.1) * width/30;
+  }
+
   // display
   //
   // display the bullet

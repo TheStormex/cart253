@@ -63,9 +63,8 @@ let textTimerAmount = 3000; // 3 seconds
 let minigameTimer = 0;
 let minigameTimerAmount = 5000; // 5 seconds
 
-// spawnTimer and spawnTimerAmount: how long until another minigame object is spawned
+// spawnTimer: when the minigame's spawnSpeed is reached, spawn another object
 let spawnTimer = 0;
-let spawnTimerAmount = 80; // 2/25 of a second
 
 // setup()
 //
@@ -74,74 +73,7 @@ function setup() {
   // Make the canvas fit the screen
   var canvas = createCanvas(windowWidth, windowHeight);
   canvas.style('display', 'block');
-  // Create the states
-  titleState = new TitleState();
-  instructionsState = new InstructionsState();
-  gameState = new GameState();
-  gameOverState = new GameOverState();
-  minigameState = new MinigameState();
-
-  // set the current state to title
-  whichScreen = titleState;
-
-  // create the player and enemy objects
-  player = {
-    name: "Player",
-    health: 200,
-    maxHealth: 200,
-    incoming: 0,
-    stun: false,
-    x: width/2,
-    y: height/2,
-    size: width/20+height/20,
-    speed: 10,
-    vx: 0,
-    vy: 0
-  }
-  enemy = {
-    name: "Enemy",
-    health: 500,
-    maxHealth: 500,
-    incoming: 0,
-    stun: false
-  }
-
-  // Create the player's deck of abilities (20)
-  for (var i = 0; i < 8; i++) {
-    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerMinigame, color(255,0,0), 80);
-    abilitiesPlayerDeck.push(fireSpear);
-  }
-  for (var i = 0; i < 3; i++) {
-    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerMinigame, color(0,255,255), 80);
-    abilitiesPlayerDeck.push(cleanse);
-  }
-  for (var i = 0; i < 3; i++) {
-    let paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", "status", 10, playerMinigame, color(255,255,0), 80);
-    abilitiesPlayerDeck.push(paralyse);
-  }
-  for (var i = 0; i < 3; i++) {
-    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerMinigame, color(0,255,0), 80);
-    abilitiesPlayerDeck.push(shield);
-  }
-  for (var i = 0; i < 3; i++) {
-    let curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", "number", 5, playerMinigame, color(255,0,255), 80);
-    abilitiesPlayerDeck.push(curse);
-  }
-  // Shuffle the player's deck
-  abilitiesPlayerDeck = shuffle(abilitiesPlayerDeck);
-  // The player draws the 5 card starting hand
-  for (var i = 0; i < 5; i++) {
-    abilitiesHave.push(abilitiesPlayerDeck[0]);
-    abilitiesPlayerDeck.splice(0, 1);
-  }
-  console.log(abilitiesHave);
-  // create the list of enemy abilities
-  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(0), 1000);
-  enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", "number", 10, enemyBulletStormMinigame, color(0), 80);
-  enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", "status", 3, enemyBulletStormMinigame, color(0), 100);
-  enemyAbilitiesHave.push(newEnemyAbility);
+  start();
 }
 
 // draw()
@@ -164,7 +96,7 @@ function mousePressed() {
 //
 // create objects in the mini games
 function spawn() {
-  if (millis() - spawnTimer > spawnTimerAmount) {
+  if (millis() - spawnTimer > chosenAbility.spawnSpeed) {
     if (whoseTurn === 1) {
       let whichObject = floor(random(0,2));
       if (whichObject === 0) {
@@ -295,6 +227,22 @@ function enemyNeutronBeamMinigame() {
   }
 }
 
+// enemyStaticBoltMinigame()
+//
+// minigame for static bolt
+function enemyStaticBoltMinigame() {
+  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  enemyMinigamePlayer();
+  // move and display all bullets and check if they touch the player
+  for (var i = 0; i < bullets.length; i++) {
+    bullets[i].index = bullets.indexOf(bullets[i]);
+    bullets[i].wave();
+    bullets[i].move();
+    bullets[i].display();
+    bullets[i].touchPlayer();
+  }
+}
+
 // enemyMinigamePlayer()
 //
 // Moving and displaying the player in enemy minigames
@@ -335,4 +283,97 @@ function enemyMinigamePlayer() {
   ellipseMode(CENTER);
   ellipse(player.x, player.y, player.size);
   pop();
+}
+
+// reset()
+//
+// Reset all stats and start the game again
+function reset() {
+  subScreen = 0;
+  whoseTurn = 1;
+  victory = 0;
+  chosenAbility = 0;
+  bullets = [];
+  minigameHits = 0;
+  targets = [];
+  obstacles = [];
+  abilitiesHave = [];
+  abilitiesPlayerDeck = [];
+  abilityX = 0;
+  enemyAbilitiesHave = [];
+  // start the game again
+  start();
+}
+
+// start()
+//
+// Set up the game
+function start() {
+  // Create the states
+  titleState = new TitleState();
+  instructionsState = new InstructionsState();
+  gameState = new GameState();
+  gameOverState = new GameOverState();
+  minigameState = new MinigameState();
+
+  // set the current state to title
+  whichScreen = titleState;
+
+  // create the player and enemy objects
+  player = {
+    name: "Player",
+    health: 200,
+    maxHealth: 200,
+    incoming: 0,
+    stun: false,
+    x: width/2,
+    y: height/2,
+    size: width/20+height/20,
+    speed: 10,
+    vx: 0,
+    vy: 0
+  }
+  enemy = {
+    name: "Enemy",
+    health: 500,
+    maxHealth: 500,
+    incoming: 0,
+    stun: false
+  }
+
+  // Create the player's deck of abilities (20)
+  for (var i = 0; i < 8; i++) {
+    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerMinigame, color(255,0,0), 80);
+    abilitiesPlayerDeck.push(fireSpear);
+  }
+  for (var i = 0; i < 3; i++) {
+    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerMinigame, color(0,255,255), 80);
+    abilitiesPlayerDeck.push(cleanse);
+  }
+  for (var i = 0; i < 3; i++) {
+    let paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", "status", 10, playerMinigame, color(255,255,0), 80);
+    abilitiesPlayerDeck.push(paralyse);
+  }
+  for (var i = 0; i < 3; i++) {
+    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerMinigame, color(0,255,0), 80);
+    abilitiesPlayerDeck.push(shield);
+  }
+  for (var i = 0; i < 3; i++) {
+    let curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", "number", 5, playerMinigame, color(255,0,255), 80);
+    abilitiesPlayerDeck.push(curse);
+  }
+  // Shuffle the player's deck
+  abilitiesPlayerDeck = shuffle(abilitiesPlayerDeck);
+  // The player draws the 5 card starting hand
+  for (var i = 0; i < 5; i++) {
+    abilitiesHave.push(abilitiesPlayerDeck[0]);
+    abilitiesPlayerDeck.splice(0, 1);
+  }
+  // create the list of enemy abilities
+  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 500);
+  enemyAbilitiesHave.push(newEnemyAbility);
+  newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", "number", 10, enemyBulletStormMinigame, color(0), 80);
+  enemyAbilitiesHave.push(newEnemyAbility);
+  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", "status", 3, enemyStaticBoltMinigame, color(255, 255, 0), 350);
+  enemyAbilitiesHave.push(newEnemyAbility);
 }

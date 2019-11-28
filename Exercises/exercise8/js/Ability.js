@@ -37,8 +37,10 @@ class Ability {
     this.minigame = minigame;
     // the color of the card
     this.color = color;
+    // the speed at which projectiles spawn
+    this.spawnSpeed = spawnSpeed;
   }
-  displayInventory(i) {
+  displayInventory(i) { // display this ability in the player's inventory
     push();
     rectMode(CENTER);
     noStroke();
@@ -52,7 +54,6 @@ class Ability {
     textSize(width/60+height/60);
     text(this.text, this.x, this.y+height/20);
     pop();
-    // console.log(this.x);
   }
 
 }

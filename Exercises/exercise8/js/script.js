@@ -4,12 +4,19 @@
 // by Che Tan
 // A turn based RPG with cards and mini games
 
-// which screen it is 0 = title, 1 = instructions, 2 = game, 3 = minigame, 4 = game over (win or lose);
-let whichScreen = 0;
+// which screen / state it is
+let whichScreen;
 
 // sub screens for the game
 // game: 0 = choose ability, 1 =  action text, 2 = aftermath text
 let subScreen = 0;
+
+// the states
+let titleState;
+let instructionsState;
+let gameState;
+let gameOverState;
+let minigameState;
 
 // Whose turn it is, player (1) or enemy (-1)
 let whoseTurn = 1;
@@ -67,7 +74,17 @@ function setup() {
   // Make the canvas fit the screen
   var canvas = createCanvas(windowWidth, windowHeight);
   canvas.style('display', 'block');
+  // Create the states
+  titleState = new TitleState();
+  instructionsState = new InstructionsState();
+  gameState = new GameState();
+  gameOverState = new GameOverState();
+  minigameState = new MinigameState();
 
+  // set the current state to title
+  whichScreen = titleState;
+
+  // create the player and enemy objects
   player = {
     name: "Player",
     health: 200,
@@ -88,8 +105,6 @@ function setup() {
     incoming: 0,
     stun: false
   }
-
-  // Create the player's five abilities
 
   // Create the player's deck of abilities (20)
   for (var i = 0; i < 8; i++) {
@@ -135,298 +150,14 @@ function setup() {
 function draw() {
   // Clear the background to grey
   background(50);
-  switch (whichScreen) {
-    case 0: // Title
-      // Play button
-      push();
-      rectMode(CENTER);
-      noStroke();
-      fill(0,0,255);
-      rect(width/2, height-height/4, width/5, height/5);
-      fill(0);
-      textSize(width/20+height/20);
-      textAlign(CENTER,CENTER);
-      text("Play", width/2, height-height/4);
-      pop();
-      // Title text
-      push();
-      textSize(width/20 + height/20);
-      fill(255);
-      textAlign(CENTER, CENTER);
-      text("Wizard Vs. Killer Robot", width/2, height/5);
-      pop();
-      break;
-    case 1: // Instructions
-      // Fight! button
-      push();
-      rectMode(CENTER);
-      noStroke();
-      fill(0,0,255);
-      rect(width/2, height-height/4, width/5, height/5);
-      fill(0);
-      textSize(width/30+height/30);
-      textAlign(CENTER,CENTER);
-      text("Fight!", width/2, height-height/4);
-      pop();
-      // Instruction text
-      push();
-      textSize(width/20);
-      fill(255);
-      textAlign(CENTER, CENTER);
-      text("Instructions", width/2, height/8);
-      pop();
-      // The instructions
-      push();
-      fill(255);
-      rectMode(CENTER);
-      rect(width/2,height/4+height/6,width-width/10,height/2-height/20);
-      fill(0);
-      textSize(width/40+height/60);
-      textAlign(CENTER,CENTER);
-      text("You are a powerful wizard who can cast spells", width/2, height/4);
-      text("A killer robot stands in your way with giant guns", width/2, height/4+height/18);
-      text("Choose an ability in your inventory to use it", width/2, height/4+(height/18)*2);
-      text("Click on green circles and avoid red ones", width/2, height/4+(height/18)*3);
-      text("Control your vessel to dodge the bullets", width/2, height/4+(height/18)*4);
-      text("You will get another ability every turn", width/2, height/4+(height/18)*5);
-      text("Blow up the robot with your magic! Good luck!", width/2, height/4+(height/18)*6);
-      pop();
-      break;
-    case 2: // Game
-      push()
-      rectMode(CENTER);
-      strokeWeight(20);
-      rect(width/2, height-height/4, width, height/2);
-      pop();
-      //
-      push();
-      // the player avatar
-      ellipseMode(CORNER);
-      noStroke();
-      fill(0,0,255);
-      ellipse(width/50, height/2+height/30, width/30+height/30);
-      // The player's name
-      textAlign(CENTER,CENTER);
-      fill(0);
-      textSize(width/50+height/50);
-      text(player.name,width/7.5,height/2+height/12);
-      // the player's health bar
-      rectMode(CORNER);
-      strokeWeight(5);
-      stroke(0);
-      fill(255);
-      rect(width/5, height/2+height/30, width-width/4, height/10);
-      noStroke();
-      fill(255,0,0);
-      let lifeBarSizePlayer = map(player.health*100/player.maxHealth,0,100,0,width-width/4);
-      rect(width/5, height/2+height/30, lifeBarSizePlayer, height/10);
-      textAlign(CENTER,CENTER);
-      textSize(width/30);
-      fill(0);
-      text(player.health + "/" + player.maxHealth, width/2, height/2+height/10);
-      pop();
-      // the enemy avatar
-      push()
-      ellipseMode(CENTER);
-      noStroke();
-      fill(255,255,0);
-      ellipse(width/2, height/3, width/20+height/20);
-      pop();
-      // The enemy's name
-      push();
-      fill(255);
-      textAlign(CENTER,CENTER);
-      textSize(width/30);
-      text(enemy.name,width/2,height/10);
-      pop();
-      // the enemy's health bar
-      push();
-      rectMode(CORNER);
-      strokeWeight(5);
-      stroke(0);
-      fill(255);
-      rect(width/2-width/16, height/6, width/8, height/20);
-      noStroke();
-      fill(255,0,0);
-      let lifeBarSizeEnemy = map(enemy.health*100/enemy.maxHealth,0,100, 0,width/8);
-      rect(width/2-width/16, height/6, lifeBarSizeEnemy, height/20);
-      textAlign(CENTER,CENTER);
-      textSize(width/60);
-      fill(0);
-      text(enemy.health + "/" + enemy.maxHealth, width/2, height/6+height/30);
-      pop();
-      switch (subScreen) {
-        case 0: // choose ability
-        // each of the five abilities the player can use
-        for (var i = 0; i < abilitiesHave.length; i++) {
-          abilitiesHave[i].displayInventory(i);
-        }
-          break;
-        case 1: // character used X on Y
-        if (millis() - textTimer < textTimerAmount) {
-          push();
-          fill(0);
-          textAlign(CENTER,CENTER);
-          textSize(width/30+height/30);
-          text(chosenAbility.user.name + " used " + chosenAbility.name + " on " + chosenAbility.targets.name + "!", width/2, height-height/4);
-          pop();
-        } else {
-            minigameTimer = millis();
-            whichScreen = 3;
-        }
-          break;
-        case 2: // character received X
-        if (millis() - textTimer < textTimerAmount) {
-        push();
-        fill(0);
-        textAlign(CENTER,CENTER);
-        textSize(width/40+height/40);
-        text(chosenAbility.targets.name + " received " + chosenAbility.totalAmount + " " + chosenAbility.effect + " from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
-        pop();
-      } else {
-        // check if the player wins or loses
-        if (player.health <= 0) {
-          victory = -1;
-          whichScreen = 4;
-        }
-        if (enemy.health <= 0) {
-          victory = 1;
-          whichScreen = 4;
-        }
-        if (whoseTurn === 1) { // if it is the player's turn
-          if (!enemy.stun) { // if enemy is not stunned, go to enemy's turn
-            goToEnemyTurn();
-          }
-          else if (enemy.stun) { // if enemy is stunned, go to player's turn
-            enemy.stun = false;
-            goToPlayerTurn();
-          }
-        }
-        else if (whoseTurn === -1) { // if it is the enemy's turn
-          if (!player.stun) { // if player is not stunned, go to player's turn
-            goToPlayerTurn();
-          }
-          else if (player.stun) { // if player is stunned, go to enemy's turn
-            player.stun = false;
-            goToEnemyTurn();
-          }
-        }
-      }
-          break;
-        default:
-      }
-      break;
-    case 3: // Mini game
-    // create a white canvas for minigame
-      push();
-      rectMode(CENTER);
-      strokeWeight(5);
-      stroke(0);
-      fill(255);
-      rect(width/2,height/2,width,height);
-      pop();
-      if (millis() - minigameTimer < minigameTimerAmount) {
-        chosenAbility.minigame();
-      } else { // go to effect of ability
-        // the ability's effect happen here before going to effect text
-        obstacles = [];
-        targets = [];
-        bullets = [];
-        textTimer = millis();
-        abilityHappens();
-        minigameHits = 0;
-        subScreen = 2;
-        whichScreen = 2;
-      }
-      break;
-    case 4: // Game over
-      push();
-      textAlign(CENTER, CENTER);
-      textSize(width/40+height/40);
-      fill(255);
-      // see who won then present either happy or sad ending
-      if (victory === -1) {
-        text("You lost!", width/2, height/5);
-      }
-      if (victory === 1) {
-        text("You won!", width/2, height/5);
-      }
-      // play again button
-      rectMode(CENTER);
-      noStroke();
-      fill(0,0,255);
-      rect(width/2, height-height/4, width/5, height/5);
-      fill(0);
-      textSize(width/50+height/50);
-      textAlign(CENTER,CENTER);
-      text("Play Again", width/2, height-height/4);
-      pop();
-      break;
-    default:
-  }
+  whichScreen.draw();
 }
 
 // mousePressed
 //
 // when the button is pressed
 function mousePressed() {
-  switch (whichScreen) {
-    case 0:
-      if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
-        // move to screen 1
-        whichScreen = 1;
-      }
-      break;
-    case 1:
-      if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
-        // move to screen 2
-        whichScreen = 2;
-      }
-      break;
-    case 2:
-      if (subScreen === 0) { // if we are choosing to click on an ability
-        for (var i = 0; i < abilitiesHave.length; i++) {
-          if (mouseX > abilitiesHave[i].x-abilitiesHave[i].sizeX/2 && mouseX < abilitiesHave[i].x+abilitiesHave[i].sizeX/2 && mouseY > abilitiesHave[i].y-abilitiesHave[i].sizeY/2 && mouseY < abilitiesHave[i].y+abilitiesHave[i].sizeY/2) {
-            // choose this ability, add another card to hand and go to text
-            chosenAbility = abilitiesHave[i];
-            // console.log(abilitiesHave[0]);
-            // console.log(abilitiesHave[1]);
-            // console.log(abilitiesHave[2]);
-            // console.log(abilitiesHave[3]);
-            // console.log(abilitiesHave[4]);
-            // console.log("NEW");
-            abilitiesHave.splice(i, 1);
-            abilitiesHave.push(abilitiesPlayerDeck[0]);
-            abilitiesPlayerDeck.splice(0, 1);
-            // console.log(abilitiesHave[0]);
-            // console.log(abilitiesHave[1]);
-            // console.log(abilitiesHave[2]);
-            // console.log(abilitiesHave[3]);
-            // console.log(abilitiesHave[4]);
-            // console.log("DONE");
-            textTimer = millis();
-            subScreen = 1;
-          }
-        }
-      }
-      break;
-    case 3:
-      for (var i = 0; i < targets.length; i++) {
-        targets[i].clicked();
-      }
-      for (var i = 0; i < obstacles.length; i++) {
-        obstacles[i].clicked();
-      }
-      break;
-    case 4:
-      if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
-        // move to screen 2
-        whichScreen = 2;
-      }
-      break;
-    default:
-
-  }
+  whichScreen.mousePressed();
 }
 
 // spawn()

@@ -8,7 +8,7 @@ class Ability {
   //
   // Sets the initial values for the Ability's properties
   // Either sets default values or uses the arguments provided
-  constructor(name, text, user, targets, effect, amount, minigame, color) {
+  constructor(name, text, user, targets, effect, effectType, amount, minigame, color, spawnSpeed) {
     // Position in the inventory (if in the inventory)
     this.x = width/10;
     this.y = height/2+height/3.2;
@@ -25,6 +25,8 @@ class Ability {
     this.targets = targets;
     // what effect this ability has
     this.effect = effect;
+    // what type of effect this is (change a number or cause a status effect)
+    this.effectType = effectType;
     // how much of the effect per minigame hit
     this.amount = amount;
     // how much total effect

@@ -38,14 +38,6 @@ let abilitiesHave = [];
 // Array of abilities the player currently has in the deck
 let abilitiesPlayerDeck = [];
 
-// Array of abilities the player can get
-let fireSpear;
-let cleanse;
-let paralyse;
-let shield;
-let curse;
-let abilitiesPlayerAll = [];
-
 let abilityX = 0;
 
 // Array of abilities the enemy can get
@@ -72,7 +64,9 @@ let spawnTimerAmount = 80; // 2/25 of a second
 //
 // Sets up a canvas
 function setup() {
-  createCanvas(windowWidth-windowWidth/50, windowHeight-windowHeight/50);
+  // Make the canvas fit the screen
+  var canvas = createCanvas(windowWidth, windowHeight);
+  canvas.style('display', 'block');
 
   player = {
     name: "Player",
@@ -96,43 +90,42 @@ function setup() {
   }
 
   // Create the player's five abilities
-  fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", 10, playerMinigame, color(255,0,0));
-  cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", 8, playerMinigame, color(0,255,255));
-  paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", 10, playerMinigame, color(255,255,0));
-  shield = new Ability("Shield", "Protect self", player, player, "% incoming", -5, playerMinigame, color(0,255,0));
-  curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", 5, playerMinigame, color(255,0,255));
-  abilitiesPlayerAll = [fireSpear, cleanse, paralyse, shield, curse];
 
   // Create the player's deck of abilities (20)
   for (var i = 0; i < 8; i++) {
+    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerMinigame, color(255,0,0), 80);
     abilitiesPlayerDeck.push(fireSpear);
   }
   for (var i = 0; i < 3; i++) {
+    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerMinigame, color(0,255,255), 80);
     abilitiesPlayerDeck.push(cleanse);
   }
   for (var i = 0; i < 3; i++) {
+    let paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", "status", 10, playerMinigame, color(255,255,0), 80);
     abilitiesPlayerDeck.push(paralyse);
   }
   for (var i = 0; i < 3; i++) {
+    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerMinigame, color(0,255,0), 80);
     abilitiesPlayerDeck.push(shield);
   }
   for (var i = 0; i < 3; i++) {
+    let curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", "number", 5, playerMinigame, color(255,0,255), 80);
     abilitiesPlayerDeck.push(curse);
   }
   // Shuffle the player's deck
   abilitiesPlayerDeck = shuffle(abilitiesPlayerDeck);
   // The player draws the 5 card starting hand
   for (var i = 0; i < 5; i++) {
-    abilitiesHave.push(abilitiesPlayerDeck[i]);
-    abilitiesPlayerDeck.splice(abilitiesPlayerDeck[i], 1);
+    abilitiesHave.push(abilitiesPlayerDeck[0]);
+    abilitiesPlayerDeck.splice(0, 1);
   }
   console.log(abilitiesHave);
   // create the list of enemy abilities
-  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", 10, enemyBulletStormMinigame, color(0));
+  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(0), 1000);
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", 10, enemyBulletStormMinigame, color(0));
+  newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", "number", 10, enemyBulletStormMinigame, color(0), 80);
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", 3, enemyBulletStormMinigame, color(0));
+  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", "status", 3, enemyBulletStormMinigame, color(0), 100);
   enemyAbilitiesHave.push(newEnemyAbility);
 }
 
@@ -267,10 +260,6 @@ function draw() {
         // each of the five abilities the player can use
         for (var i = 0; i < abilitiesHave.length; i++) {
           abilitiesHave[i].displayInventory(i);
-          console.log("One " + i + abilitiesHave[i].name + " " + abilitiesHave[i].x);
-        }
-        for (var i = 0; i < abilitiesHave.length; i++) {
-          console.log("Two " + i + abilitiesHave[i].name + " " + abilitiesHave[i].x);
         }
           break;
         case 1: // character used X on Y

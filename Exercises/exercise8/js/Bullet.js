@@ -4,9 +4,9 @@
 
 
 class Bullet extends MinigameObj {
-  constructor(x, y, size, speedX, speedY) {
+  constructor(x, y, size, vx, vy) {
     // To MinigameObj
-    super(x, y, size, speedX, speedY);
+    super(x, y, size, vx, vy);
   }
   touchPlayer() {
     // if touch player, player loses life
@@ -19,15 +19,19 @@ class Bullet extends MinigameObj {
   bounce() { // if this bullet bounces on walls run this code
     if (this.x-this.size/2 <= 0) {
       this.x = this.size/2;
+      this.vx *= -1;
     }
     if (this.x+this.size/2 > width) {
       this.x = width-this.size/2;
+      this.vx *= -1;
     }
     if (this.y-this.size/2 < 0) {
       this.y = this.size/2;
+      this.vy *= -1;
     }
     if (this.y+this.size/2 > height) {
       this.y = height-this.size/2;
+      this.vy *= -1;
     }
   }
   // display

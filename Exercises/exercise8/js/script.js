@@ -214,6 +214,7 @@ function abilityHappens() {
     case "stun":
       if (minigameHits >= chosenAbility.amount) {
         abilityTargets.stun = true;
+        chosenAbility.statusCause = true;
       }
       break;
     case "% incoming":

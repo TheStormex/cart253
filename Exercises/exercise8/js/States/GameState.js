@@ -93,7 +93,16 @@ class GameState extends State {
       fill(0);
       textAlign(CENTER,CENTER);
       textSize(width/40+height/40);
-      text(chosenAbility.targets.name + " received " + chosenAbility.totalAmount + " " + chosenAbility.effect + " from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+      if (chosenAbility.effectType === "number") {
+        text(chosenAbility.targets.name + " received " + chosenAbility.totalAmount + " " + chosenAbility.effect + " from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+      } else if (chosenAbility.effectType === "status") {
+        if (chosenAbility.statusCause === true) {
+          text(chosenAbility.targets.name + " was caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+        } else if (chosenAbility.statusCause === false) {
+          text(chosenAbility.targets.name + " was not caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+        }
+      }
+
       pop();
     } else {
       // check if the player wins or loses

@@ -27,6 +27,8 @@ class Ability {
     this.effect = effect;
     // what type of effect this is (change a number or cause a status effect)
     this.effectType = effectType;
+    // if this effect is successful (status is caused)
+    this.statusCause = false;
     // how much of the effect per minigame hit
     this.amount = amount;
     // how much total effect

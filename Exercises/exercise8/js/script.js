@@ -369,6 +369,7 @@ function start() {
     abilitiesHave.push(abilitiesPlayerDeck[0]);
     abilitiesPlayerDeck.splice(0, 1);
   }
+  console.log(abilitiesHave);
   // create the list of enemy abilities
   let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 500);
   enemyAbilitiesHave.push(newEnemyAbility);

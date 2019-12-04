@@ -169,6 +169,7 @@ function abilityHappens() {
       if (minigameHits >= chosenAbility.amount) {
         abilityTargets.stun = true;
         chosenAbility.statusCause = true;
+        abilityTargets.stunLeft += 2;
       }
       break;
     case "% incoming":
@@ -200,10 +201,44 @@ function goToEnemyTurn() {
   subScreen = 1;
 }
 
-// playerMinigame()
+// playerClickMinigame()
 //
-// the player's minigame
-function playerMinigame() {
+// the player's clicking minigame
+function playerClickMinigame() {
+  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  for (var i = 0; i < targets.length; i++) {
+    targets[i].index = targets.indexOf(targets[i]);
+    targets[i].move();
+    targets[i].display();
+  }
+  for (var i = 0; i < obstacles.length; i++) {
+    obstacles[i].index = obstacles.indexOf(obstacles[i]);
+    obstacles[i].move();
+    obstacles[i].display();
+  }
+}
+
+// playerShootMinigame()
+//
+// the player's shooting minigame
+function playerShootMinigame() {
+  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  for (var i = 0; i < targets.length; i++) {
+    targets[i].index = targets.indexOf(targets[i]);
+    targets[i].move();
+    targets[i].display();
+  }
+  for (var i = 0; i < obstacles.length; i++) {
+    obstacles[i].index = obstacles.indexOf(obstacles[i]);
+    obstacles[i].move();
+    obstacles[i].display();
+  }
+}
+
+// playerCollectMinigame()
+//
+// the player's collecting minigame
+function playerCollectMinigame() {
   spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
   for (var i = 0; i < targets.length; i++) {
     targets[i].index = targets.indexOf(targets[i]);
@@ -223,7 +258,7 @@ function playerMinigame() {
 // minigame for bulletStorm
 function enemyBulletStormMinigame() {
   spawn(imageEnemyBullet); // spawn bullets (random size and speed) that fly accross the screen 3 per second
-  enemyMinigamePlayer();
+  minigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
     bullets[i].index = bullets.indexOf(bullets[i]);
@@ -238,7 +273,7 @@ function enemyBulletStormMinigame() {
 // minigame for neutron beam
 function enemyNeutronBeamMinigame() {
   spawn(imageEnemyBeam); // spawn bullets (random size and speed) that fly accross the screen 3 per second
-  enemyMinigamePlayer();
+  minigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
     bullets[i].index = bullets.indexOf(bullets[i]);
@@ -254,7 +289,7 @@ function enemyNeutronBeamMinigame() {
 // minigame for static bolt
 function enemyStaticBoltMinigame() {
   spawn(imageEnemyBolt); // spawn bullets (random size and speed) that fly accross the screen 3 per second
-  enemyMinigamePlayer();
+  minigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
     bullets[i].index = bullets.indexOf(bullets[i]);
@@ -265,10 +300,10 @@ function enemyStaticBoltMinigame() {
   }
 }
 
-// enemyMinigamePlayer()
+// minigamePlayer()
 //
-// Moving and displaying the player in enemy minigames
-function enemyMinigamePlayer() {
+// Moving and displaying the player in applicable minigames
+function minigamePlayer() {
   // move and display the player
   player.vx = 0;
   player.vy = 0;
@@ -343,10 +378,12 @@ function start() {
   // create the player and enemy objects
   player = {
     name: "Player",
+    image: imagePlayer,
     health: 200,
     maxHealth: 200,
     incoming: 0,
     stun: false,
+    stunLeft: 0,
     x: width/2,
     y: height/2,
     size: width/20+height/20,
@@ -356,31 +393,33 @@ function start() {
   }
   enemy = {
     name: "Enemy",
+    image: imageEnemy,
     health: 500,
     maxHealth: 500,
     incoming: 0,
-    stun: false
+    stun: false,
+    stunLeft: 0
   }
 
   // Create the player's deck of abilities (20)
   for (var i = 0; i < 8; i++) {
-    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerMinigame, color(255,0,0), 80);
+    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerShootMinigame, color(255,0,0), 80);
     abilitiesPlayerDeck.push(fireSpear);
   }
   for (var i = 0; i < 3; i++) {
-    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerMinigame, color(0,255,255), 80);
+    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerCollectMinigame, color(0,255,255), 80);
     abilitiesPlayerDeck.push(cleanse);
   }
   for (var i = 0; i < 3; i++) {
-    let paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", "status", 10, playerMinigame, color(255,255,0), 80);
+    let paralyse = new Ability("Paralyse", "Stun for 2 turns", player, enemy, "stun", "status", 10, playerClickMinigame, color(255,255,0), 80);
     abilitiesPlayerDeck.push(paralyse);
   }
   for (var i = 0; i < 3; i++) {
-    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerMinigame, color(0,255,0), 80);
+    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerCollectMinigame, color(0,255,0), 80);
     abilitiesPlayerDeck.push(shield);
   }
   for (var i = 0; i < 3; i++) {
-    let curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", "number", 5, playerMinigame, color(255,0,255), 80);
+    let curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", "number", 5, playerClickMinigame, color(255,0,255), 80);
     abilitiesPlayerDeck.push(curse);
   }
   // Shuffle the player's deck

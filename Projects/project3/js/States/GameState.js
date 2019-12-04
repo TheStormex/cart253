@@ -39,6 +39,18 @@ class GameState extends State {
     fill(0);
     text(player.health + "/" + player.maxHealth, width/2, height/2+height/10);
     pop();
+    // the player and the enemy's incoming damage
+    push();
+    rectMode(CORNER);
+    noStroke();
+    fill(255);
+    rect(width/50, height/50, width/3, height/5);
+    textAlign(LEFT, BASELINE);
+    textSize(width/50);
+    fill(0);
+    text(player.name + "'s Incoming Damage: " + player.incoming + "%", width/40, height/10);
+    text(enemy.name + "'s Incoming Damage: " + enemy.incoming + "%", width/40, height/6);
+    pop();
     // the enemy avatar
     push()
     imageMode(CENTER);
@@ -72,6 +84,11 @@ class GameState extends State {
       // each of the five abilities the player can use
       for (var i = 0; i < abilitiesHave.length; i++) {
         abilitiesHave[i].displayInventory(i);
+      }
+      // if the player does not have any abilities left, they lose the game
+      if (abilitiesHave.length + abilitiesPlayerDeck.length <= 0) {
+        victory = -1;
+        whichScreen = gameOverState;
       }
         break;
       case 1: // character used X on Y
@@ -119,7 +136,10 @@ class GameState extends State {
           goToEnemyTurn();
         }
         else if (enemy.stun) { // if enemy is stunned, go to player's turn
-          enemy.stun = false;
+          enemy.stunLeft--;
+          if (enemy.stunLeft <= 0) {
+            enemy.stun = false;
+          }
           goToPlayerTurn();
         }
       }
@@ -128,7 +148,10 @@ class GameState extends State {
           goToPlayerTurn();
         }
         else if (player.stun) { // if player is stunned, go to enemy's turn
-          player.stun = false;
+          player.stunLeft--;
+          if (player.stunLeft <= 0) {
+            player.stun = false;
+          }
           goToEnemyTurn();
         }
       }

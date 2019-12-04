@@ -81,14 +81,14 @@ class GameState extends State {
     pop();
     switch (subScreen) {
       case 0: // choose ability
-      // each of the five abilities the player can use
-      for (var i = 0; i < abilitiesHave.length; i++) {
-        abilitiesHave[i].displayInventory(i);
-      }
       // if the player does not have any abilities left, they lose the game
       if (abilitiesHave.length + abilitiesPlayerDeck.length <= 0) {
         victory = -1;
         whichScreen = gameOverState;
+      }
+      // each of the five abilities the player can use
+      for (var i = 0; i < abilitiesHave.length; i++) {
+        abilitiesHave[i].displayInventory(i);
       }
         break;
       case 1: // character used X on Y
@@ -168,8 +168,6 @@ class GameState extends State {
           // choose this ability, add another card to hand and go to text
           chosenAbility = abilitiesHave[i];
           abilitiesHave.splice(i, 1);
-          abilitiesHave.push(abilitiesPlayerDeck[0]);
-          abilitiesPlayerDeck.splice(0, 1);
           textTimer = millis();
           subScreen = 1;
         }

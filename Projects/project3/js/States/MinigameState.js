@@ -28,11 +28,13 @@ class MinigameState extends State {
   }
 
   mousePressed() {
-    for (var i = 0; i < targets.length; i++) {
-      targets[i].clicked();
-    }
-    for (var i = 0; i < obstacles.length; i++) {
-      obstacles[i].clicked();
+    if (chosenAbility.minigame === playerClickMinigame) {
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].clicked();
+      }
+      for (var i = 0; i < obstacles.length; i++) {
+        obstacles[i].clicked();
+      }
     }
   }
 }

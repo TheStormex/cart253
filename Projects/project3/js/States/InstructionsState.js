@@ -34,7 +34,7 @@ class InstructionsState extends State {
     text("A killer robot stands in your way with giant guns", width/2, height/4+height/18);
     text("Choose an ability in your inventory to use it", width/2, height/4+(height/18)*2);
     text("Click on green circles and avoid red ones", width/2, height/4+(height/18)*3);
-    text("Control your vessel to dodge the bullets", width/2, height/4+(height/18)*4);
+    text("Control your vessel to dodge the bullets and collect the leaves", width/2, height/4+(height/18)*4);
     text("You will get another ability every turn", width/2, height/4+(height/18)*5);
     text("Blow up the robot with your magic! Good luck!", width/2, height/4+(height/18)*6);
     pop();

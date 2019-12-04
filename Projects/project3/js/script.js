@@ -39,6 +39,12 @@ let targets = [];
 // Array of obstacles the player must not hit in the mini game
 let obstacles = [];
 
+// Array of player bullets in the shooting minigame
+let playerBullets = [];
+
+// Array of enemy avatars to hit in the shooting minigame
+let enemyAvatars = [];
+
 // Array of abilities the player currently has in the inventory
 let abilitiesHave = [];
 
@@ -184,6 +190,9 @@ function abilityHappens() {
 // Go from the enemy's turn to the player's turn
 function goToPlayerTurn() {
   textTimer = millis();
+  // the player gets another ability from the deck
+  abilitiesHave.push(abilitiesPlayerDeck[0]);
+  abilitiesPlayerDeck.splice(0, 1);
   chosenAbility = 0;
   whoseTurn = 1;
   subScreen = 0;
@@ -222,33 +231,55 @@ function playerClickMinigame() {
 //
 // the player's shooting minigame
 function playerShootMinigame() {
-  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
-  for (var i = 0; i < targets.length; i++) {
-    targets[i].index = targets.indexOf(targets[i]);
-    targets[i].move();
-    targets[i].display();
-  }
-  for (var i = 0; i < obstacles.length; i++) {
-    obstacles[i].index = obstacles.indexOf(obstacles[i]);
-    obstacles[i].move();
-    obstacles[i].display();
-  }
+  // spawn(); // spawn targets (random size and speed) at random at 2 per second, flow accross screen
+  // for (var i = 0; i < targets.length; i++) {
+  //   targets[i].index = targets.indexOf(targets[i]);
+  //   targets[i].move();
+  //   targets[i].display();
+  // }
+  let shootButtons = ["Q", "W", "E", "R"];
+    push();
+    rectMode(CENTER);
+    textAlign(CENTER);
+    textSize(width/50+height/50);
+    strokeWeight(2);
+    stroke(0);
+    for (var i = 0; i < shootButtons.length; i++) {
+      fill(255);
+      rect(width/4 * i + width/8, height-height/10, width/4, height/5);
+      fill(0);
+      text(shootButtons[i], width/4 * i + width/8, height-height/10);
+    }
+    pop();
+    // if press the corresponding key, a player projectile is fired from the center of the quadrant
+    if (keyIsDown(81)) {
+      console.log("1");
+    }
+
+    if (keyIsDown(87)) {
+      console.log("2");
+    }
+
+    if (keyIsDown(69)) {
+      console.log("3");
+    }
+
+    if (keyIsDown(82)) {
+      console.log("4");
+    }
 }
 
 // playerCollectMinigame()
 //
 // the player's collecting minigame
 function playerCollectMinigame() {
-  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  spawn(imageLeaf); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  minigamePlayer();
   for (var i = 0; i < targets.length; i++) {
     targets[i].index = targets.indexOf(targets[i]);
     targets[i].move();
     targets[i].display();
-  }
-  for (var i = 0; i < obstacles.length; i++) {
-    obstacles[i].index = obstacles.indexOf(obstacles[i]);
-    obstacles[i].move();
-    obstacles[i].display();
+    targets[i].touched();
   }
 }
 
@@ -430,6 +461,7 @@ function start() {
     abilitiesPlayerDeck.splice(0, 1);
   }
   console.log(abilitiesHave);
+  console.log(abilitiesPlayerDeck);
   // create the list of enemy abilities
   let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 500);
   enemyAbilitiesHave.push(newEnemyAbility);

@@ -2,109 +2,379 @@
 
 // Project 3 Prototype
 // by Che Tan
-//
+// A turn based RPG with cards and mini games
 
-// which screen it is 0 = title, 1 = instructions, 2 = game, 3 = minigame, 4 = game over (win or lose);
-let whichScreen = 0;
-// subScreen 0 = choosing an ability, 1 = using the ability
+// which screen / state it is
+let whichScreen;
+
+// sub screens for the game
+// game: 0 = choose ability, 1 =  action text, 2 = aftermath text
 let subScreen = 0;
-// If the elements that should appear on this screen have been created or not
-let elementsHere = false;
+
+// the states
+let titleState;
+let instructionsState;
+let gameState;
+let gameOverState;
+let minigameState;
+
+// Whose turn it is, player (1) or enemy (-1)
+let whoseTurn = 1;
+
+// Win or lose -1 = lose, 1 = win
+let victory = 0;
+
+// Which ability is chosen by the turn character
+let chosenAbility;
+
+// Array of enemy bullets
+let bullets = [];
+
+// How many bullets the player ran into / targets the player clicked on - obstacles
+let minigameHits = 0;
+
+// Array of targets the player must hit in the mini game
+let targets = [];
+
+// Array of obstacles the player must not hit in the mini game
+let obstacles = [];
+
+// Array of abilities the player currently has in the inventory
+let abilitiesHave = [];
+
+// Array of abilities the player currently has in the deck
+let abilitiesPlayerDeck = [];
+
+let abilityX = 0;
+
+// Array of abilities the enemy can get
+let enemyAbilitiesHave = [];
+
 // The player object
 let player;
-// The button object
-let button;
-// The randomised list of abilities
-let abilitiesList = [];
+// The enemy object
+let enemy;
 
+// textTimer and textTimerAmount: how long the text stays on the screen
+let textTimer = 0;
+let textTimerAmount = 3000; // 3 seconds
 
+// minigameTimer and minigameTimerAmount: how long the minigames last before changing to results
+let minigameTimer = 0;
+let minigameTimerAmount = 5000; // 5 seconds
+
+// spawnTimer: when the minigame's spawnSpeed is reached, spawn another object
+let spawnTimer = 0;
 
 // setup()
 //
 // Sets up a canvas
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  // Create our deck of cards for the abilities
-  let abilityOneLeft = 5;
-  let abilityTwoLeft = 5;
-  let abilityThreeLeft = 5;
-  let abilityFourLeft = 5;
-  for (var i = 0; i < 20; i++) {
-    let whichAbility = floor(random(0, 4);)
-    switch (whichAbility) {
-      case 0:
-        let ability = new Ability();
-        abilitiesList(push)
-        break;
-      case 1:
-
-        break;
-      case 2:
-
-        break;
-      case 3:
-
-        break;
-      default:
-    }
-  }
+  // Make the canvas fit the screen
+  var canvas = createCanvas(windowWidth, windowHeight);
+  canvas.style('display', 'block');
+  start();
 }
 
 // draw()
 //
 // Handles input, movement and displaying for the system's objects
 function draw() {
-  // Clear the background to black
-  background(0);
-  switch (whichScreen) {
-    case 0: // Title
-    if (!elementsHere) {
-      button = new Button(width/2, height-height/4, width/5, "Play", "whichScreen = 1");
-      elementsHere = true;
-    }
-      push();
-      textSize(width/10);
-      fill(255);
-      textAlign(CENTER, CENTER);
-      text("Project 3", width/2, height/3);
-      pop();
-      button.display();
-      break;
-    case 1: // Instructions
-    if (!elementsHere) {
-      new Button(width/2, height-height/4, width/5, "Play", "whichScreen = 2");
-      elementsHere = true;
-    }
-      break;
-    case 2: // Game
-      push()
-      rectMode(CENTER);
-      strokeWeight(20);
-      rect(width/2, height-height/4, width, height/2);
-      pop();
-      if (!elementsHere) {
-        player = new Player("Hero", 50, 2, color(100,100,100));
-        elementsHere = true;
+  // Clear the background to grey
+  background(50);
+  whichScreen.draw();
+}
+
+// mousePressed
+//
+// when the button is pressed
+function mousePressed() {
+  whichScreen.mousePressed();
+}
+
+// spawn()
+//
+// create objects in the mini games
+function spawn() {
+  if (millis() - spawnTimer > chosenAbility.spawnSpeed) {
+    if (whoseTurn === 1) {
+      let whichObject = floor(random(0,2));
+      if (whichObject === 0) {
+        let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), targets.length);
+        targets.push(newTarget);
+      } else if (whichObject === 1) {
+        let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), obstacles.length);
+        obstacles.push(newObstacle);
       }
-        player.displayGame();
+    }
+    if (whoseTurn === -1) {
+      let newBullet = new Bullet(random(0, width), 0, random(width/40+height/40, width/30+height/30), random(-12, 12), random(15, 18), bullets.length);
+      bullets.push(newBullet);
+    }
+  spawnTimer = millis();
+  }
+}
 
-      switch (subScreen) {
-        case 0:
+// enemyChooseAbility()
+//
+// the enemy randomly chooses which ability to use
+function enemyChooseAbility() {
+  let enemyAbility = floor(random(0, 3));
+  chosenAbility = enemyAbilitiesHave[enemyAbility];
+}
 
-          break;
-        case 1:
-
-          break;
-        default:
+// abilityHappens()
+//
+// The ability's effect take place
+function abilityHappens() {
+  let whichEffect;
+  let abilityTargets;
+  whichEffect = chosenAbility.effect;
+  abilityTargets = chosenAbility.targets;
+  chosenAbility.totalAmount = chosenAbility.amount*minigameHits;
+  switch (whichEffect) {
+    case "damage":
+      chosenAbility.totalAmount = round(chosenAbility.totalAmount + chosenAbility.totalAmount*0.01*abilityTargets.incoming);
+      abilityTargets.health -= chosenAbility.totalAmount;
+      abilityTargets.incoming = 0; // set incoming back to 0
+      abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
+      break;
+    case "heal":
+      abilityTargets.health += chosenAbility.totalAmount;
+      abilityTargets.health = constrain(abilityTargets.health, 0, abilityTargets.maxHealth);
+      break;
+    case "stun":
+      if (minigameHits >= chosenAbility.amount) {
+        abilityTargets.stun = true;
+        chosenAbility.statusCause = true;
       }
-
       break;
-    case 3: // Mini game
-      player.displayGame();
-      break;
-    case 4: // Game over
-
+    case "% incoming":
+      abilityTargets.incoming += chosenAbility.totalAmount;
       break;
     default:
   }
+}
+
+// goToPlayerTurn()
+//
+// Go from the enemy's turn to the player's turn
+function goToPlayerTurn() {
+  textTimer = millis();
+  chosenAbility = 0;
+  whoseTurn = 1;
+  subScreen = 0;
+}
+
+// goToEnemyTurn()
+//
+// Go from the player's turn to the enemy's turn
+function goToEnemyTurn() {
+  enemyChooseAbility();
+  textTimer = millis();
+  player.x = width/2;
+  player.y = height/2;
+  whoseTurn = -1;
+  subScreen = 1;
+}
+
+// playerMinigame()
+//
+// the player's minigame
+function playerMinigame() {
+  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  for (var i = 0; i < targets.length; i++) {
+    targets[i].index = targets.indexOf(targets[i]);
+    targets[i].move();
+    targets[i].display();
+  }
+  for (var i = 0; i < obstacles.length; i++) {
+    obstacles[i].index = obstacles.indexOf(obstacles[i]);
+    obstacles[i].move();
+    obstacles[i].display();
+  }
+}
+
+
+// enemyBulletStormMinigame
+//
+// minigame for bulletStorm
+function enemyBulletStormMinigame() {
+  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  enemyMinigamePlayer();
+  // move and display all bullets and check if they touch the player
+  for (var i = 0; i < bullets.length; i++) {
+    bullets[i].index = bullets.indexOf(bullets[i]);
+    bullets[i].move();
+    bullets[i].display();
+    bullets[i].touchPlayer();
+  }
+}
+
+// enemyNeutronBeamMinigame()
+//
+// minigame for neutron beam
+function enemyNeutronBeamMinigame() {
+  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  enemyMinigamePlayer();
+  // move and display all bullets and check if they touch the player
+  for (var i = 0; i < bullets.length; i++) {
+    bullets[i].index = bullets.indexOf(bullets[i]);
+    bullets[i].move();
+    bullets[i].bounce();
+    bullets[i].display();
+    bullets[i].touchPlayer();
+  }
+}
+
+// enemyStaticBoltMinigame()
+//
+// minigame for static bolt
+function enemyStaticBoltMinigame() {
+  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  enemyMinigamePlayer();
+  // move and display all bullets and check if they touch the player
+  for (var i = 0; i < bullets.length; i++) {
+    bullets[i].index = bullets.indexOf(bullets[i]);
+    bullets[i].wave();
+    bullets[i].move();
+    bullets[i].display();
+    bullets[i].touchPlayer();
+  }
+}
+
+// enemyMinigamePlayer()
+//
+// Moving and displaying the player in enemy minigames
+function enemyMinigamePlayer() {
+  // move and display the player
+  player.vx = 0;
+  player.vy = 0;
+  if (keyIsDown(87)) {
+    player.vy = -player.speed;
+  }
+  if (keyIsDown(65)) {
+    player.vx = -player.speed;
+  }
+  if (keyIsDown(83)) {
+    player.vy = player.speed;
+  }
+  if (keyIsDown(68)) {
+    player.vx = player.speed;
+  }
+  player.x += player.vx;
+  player.y += player.vy;
+  // Make sure the player does not go outside the borders
+  if (player.x-player.size/2 <= 0) {
+    player.x = player.size/2;
+  }
+  if (player.x+player.size/2 > width) {
+    player.x = width-player.size/2;
+  }
+  if (player.y-player.size/2 < 0) {
+    player.y = player.size/2;
+  }
+  if (player.y+player.size/2 > height) {
+    player.y = height-player.size/2;
+  }
+  // Draw the player
+  push();
+  fill(0,0,255);
+  ellipseMode(CENTER);
+  ellipse(player.x, player.y, player.size);
+  pop();
+}
+
+// reset()
+//
+// Reset all stats and start the game again
+function reset() {
+  subScreen = 0;
+  whoseTurn = 1;
+  victory = 0;
+  chosenAbility = 0;
+  bullets = [];
+  minigameHits = 0;
+  targets = [];
+  obstacles = [];
+  abilitiesHave = [];
+  abilitiesPlayerDeck = [];
+  abilityX = 0;
+  enemyAbilitiesHave = [];
+  // start the game again
+  start();
+}
+
+// start()
+//
+// Set up the game
+function start() {
+  // Create the states
+  titleState = new TitleState();
+  instructionsState = new InstructionsState();
+  gameState = new GameState();
+  gameOverState = new GameOverState();
+  minigameState = new MinigameState();
+
+  // set the current state to title
+  whichScreen = titleState;
+
+  // create the player and enemy objects
+  player = {
+    name: "Player",
+    health: 200,
+    maxHealth: 200,
+    incoming: 0,
+    stun: false,
+    x: width/2,
+    y: height/2,
+    size: width/20+height/20,
+    speed: 10,
+    vx: 0,
+    vy: 0
+  }
+  enemy = {
+    name: "Enemy",
+    health: 500,
+    maxHealth: 500,
+    incoming: 0,
+    stun: false
+  }
+
+  // Create the player's deck of abilities (20)
+  for (var i = 0; i < 8; i++) {
+    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerMinigame, color(255,0,0), 80);
+    abilitiesPlayerDeck.push(fireSpear);
+  }
+  for (var i = 0; i < 3; i++) {
+    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerMinigame, color(0,255,255), 80);
+    abilitiesPlayerDeck.push(cleanse);
+  }
+  for (var i = 0; i < 3; i++) {
+    let paralyse = new Ability("Paralyse", "Stun", player, enemy, "stun", "status", 10, playerMinigame, color(255,255,0), 80);
+    abilitiesPlayerDeck.push(paralyse);
+  }
+  for (var i = 0; i < 3; i++) {
+    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerMinigame, color(0,255,0), 80);
+    abilitiesPlayerDeck.push(shield);
+  }
+  for (var i = 0; i < 3; i++) {
+    let curse = new Ability("Curse", "Weaken enemy", player, enemy, "% incoming", "number", 5, playerMinigame, color(255,0,255), 80);
+    abilitiesPlayerDeck.push(curse);
+  }
+  // Shuffle the player's deck
+  abilitiesPlayerDeck = shuffle(abilitiesPlayerDeck);
+  // The player draws the 5 card starting hand
+  for (var i = 0; i < 5; i++) {
+    abilitiesHave.push(abilitiesPlayerDeck[0]);
+    abilitiesPlayerDeck.splice(0, 1);
+  }
+  console.log(abilitiesHave);
+  // create the list of enemy abilities
+  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 500);
+  enemyAbilitiesHave.push(newEnemyAbility);
+  newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", "number", 10, enemyBulletStormMinigame, color(0), 80);
+  enemyAbilitiesHave.push(newEnemyAbility);
+  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", "status", 3, enemyStaticBoltMinigame, color(255, 255, 0), 350);
+  enemyAbilitiesHave.push(newEnemyAbility);
 }

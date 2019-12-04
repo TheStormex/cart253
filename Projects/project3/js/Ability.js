@@ -35,7 +35,7 @@ class Ability {
     this.totalAmount = 0;
     // the minigame of this ability
     this.minigame = minigame;
-    // the color of the card
+    // the color of the card (if it is a player ability)
     this.color = color;
     // the speed at which projectiles spawn
     this.spawnSpeed = spawnSpeed;

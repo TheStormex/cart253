@@ -7,22 +7,24 @@ class GameState extends State {
     // the dialogue box
     push();
     rectMode(CENTER);
+    stroke(0);
     strokeWeight(20);
+    fill(255);
     rect(width/2, height-height/4, width, height/2);
     pop();
     //
-    push();
     // the player avatar
-    ellipseMode(CORNER);
-    noStroke();
-    fill(0,0,255);
-    ellipse(width/50, height/2+height/30, width/30+height/30);
+    push();
+    imageMode(CORNER);
+    image(imagePlayer, width/50, height/2+height/20, width/18, height/15);
+    pop();
     // The player's name
     textAlign(CENTER,CENTER);
     fill(0);
     textSize(width/50+height/50);
     text(player.name,width/7.5,height/2+height/12);
     // the player's health bar
+    push()
     rectMode(CORNER);
     strokeWeight(5);
     stroke(0);
@@ -39,10 +41,8 @@ class GameState extends State {
     pop();
     // the enemy avatar
     push()
-    ellipseMode(CENTER);
-    noStroke();
-    fill(255,255,0);
-    ellipse(width/2, height/3, width/20+height/20);
+    imageMode(CENTER);
+    image(imageEnemy, width/2, height/3, width/6, height/5);
     pop();
     // The enemy's name
     push();

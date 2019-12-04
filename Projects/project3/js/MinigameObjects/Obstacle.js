@@ -4,9 +4,9 @@
 
 
 class Obstacle extends MinigameObj {
-  constructor(x, y, size, speedX, speedY) {
+  constructor(x, y, size, vx, vy, image) {
     // To MinigameObj
-    super(x, y, size, speedX, speedY);
+    super(x, y, size, vx, vy, image);
   }
   // clicked
   //

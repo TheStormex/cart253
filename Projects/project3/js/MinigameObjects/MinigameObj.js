@@ -8,7 +8,7 @@ class MinigameObj {
   //
   // Sets the initial values for the MinigameObj's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, size, vx, vy) {
+  constructor(x, y, size, vx, vy, image) {
     // Position
     this.x = x;
     this.y = y;
@@ -17,6 +17,8 @@ class MinigameObj {
     // Velocity
     this.vx = vx;
     this.vy = vy;
+    // Image
+    this.image = image; 
   }
   // move
   //

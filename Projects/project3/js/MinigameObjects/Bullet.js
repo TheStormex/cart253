@@ -4,9 +4,9 @@
 
 
 class Bullet extends MinigameObj {
-  constructor(x, y, size, vx, vy) {
+  constructor(x, y, size, vx, vy, image) {
     // To MinigameObj
-    super(x, y, size, vx, vy);
+    super(x, y, size, vx, vy, image);
     // If this moves in sine wave, keep track of angle
     this.waveAngle = 0;
   }
@@ -46,8 +46,7 @@ class Bullet extends MinigameObj {
   // display the bullet
   display() {
     push();
-    fill(0,0,0);
-    ellipse(this.x, this.y, this.size);
+    image(this.image, this.x, this.y, this.size, this.size);
     pop();
     // if (x < 0 || x > width || y < 0 || y > height) {
     //   var removed = bullets.splice(this.index, 1);

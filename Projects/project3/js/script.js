@@ -50,6 +50,15 @@ let abilityX = 0;
 // Array of abilities the enemy can get
 let enemyAbilitiesHave = [];
 
+// Images
+let imagePlayer;
+let imageLeaf;
+let imagePlayerBullet;
+let imageEnemy;
+let imageEnemyBullet;
+let imageEnemyBeam;
+let imageEnemyBolt;
+
 // The player object
 let player;
 // The enemy object
@@ -65,6 +74,19 @@ let minigameTimerAmount = 5000; // 5 seconds
 
 // spawnTimer: when the minigame's spawnSpeed is reached, spawn another object
 let spawnTimer = 0;
+
+// preload()
+//
+// Sets up the images
+function preload() {
+  imagePlayer = loadImage("assets/images/player.png")
+  imageLeaf = loadImage("assets/images/leaf.png")
+  imagePlayerBullet = loadImage("assets/images/playerBullet.png")
+  imageEnemy = loadImage("assets/images/enemy.png")
+  imageEnemyBullet = loadImage("assets/images/enemyBullet.png")
+  imageEnemyBeam = loadImage("assets/images/enemyBeam.png")
+  imageEnemyBolt = loadImage("assets/images/enemyBolt.png")
+}
 
 // setup()
 //
@@ -95,20 +117,20 @@ function mousePressed() {
 // spawn()
 //
 // create objects in the mini games
-function spawn() {
+function spawn(image) {
   if (millis() - spawnTimer > chosenAbility.spawnSpeed) {
     if (whoseTurn === 1) {
       let whichObject = floor(random(0,2));
       if (whichObject === 0) {
-        let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), targets.length);
+        let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), image);
         targets.push(newTarget);
       } else if (whichObject === 1) {
-        let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), obstacles.length);
+        let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), image);
         obstacles.push(newObstacle);
       }
     }
     if (whoseTurn === -1) {
-      let newBullet = new Bullet(random(0, width), 0, random(width/40+height/40, width/30+height/30), random(-12, 12), random(15, 18), bullets.length);
+      let newBullet = new Bullet(random(0, width), 0, random(width/40+height/40, width/30+height/30), random(-12, 12), random(15, 18), image);
       bullets.push(newBullet);
     }
   spawnTimer = millis();
@@ -200,7 +222,7 @@ function playerMinigame() {
 //
 // minigame for bulletStorm
 function enemyBulletStormMinigame() {
-  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  spawn(imageEnemyBullet); // spawn bullets (random size and speed) that fly accross the screen 3 per second
   enemyMinigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
@@ -215,7 +237,7 @@ function enemyBulletStormMinigame() {
 //
 // minigame for neutron beam
 function enemyNeutronBeamMinigame() {
-  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  spawn(imageEnemyBeam); // spawn bullets (random size and speed) that fly accross the screen 3 per second
   enemyMinigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
@@ -231,7 +253,7 @@ function enemyNeutronBeamMinigame() {
 //
 // minigame for static bolt
 function enemyStaticBoltMinigame() {
-  spawn(); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  spawn(imageEnemyBolt); // spawn bullets (random size and speed) that fly accross the screen 3 per second
   enemyMinigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
@@ -279,9 +301,8 @@ function enemyMinigamePlayer() {
   }
   // Draw the player
   push();
-  fill(0,0,255);
-  ellipseMode(CENTER);
-  ellipse(player.x, player.y, player.size);
+  imageMode(CENTER);
+  image(imagePlayer, player.x, player.y, player.size, player.size);
   pop();
 }
 

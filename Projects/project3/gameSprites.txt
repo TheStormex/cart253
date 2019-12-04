@@ -1,0 +1,31 @@
+keep the red and green ellipses, use orange rectangles for things to shoot in third player minigame
+
+sounds:
+win game
+lose game
+click button to choose / shoot blue bullet
+click / shot hit in minigame
+hit by enemy in minigame
+clicked on bad in minigame
+dudududu sound when text is being made
+in battle music
+menu music (chords of battle music as bass, some percs, nothing more)
+
+code:
+2 more player minigames
+music / sfx
+keep text within boundaries
+
+
+Function for text spawning
+Text content, text location, text size, container width
+
+Take the content, turn it into an array with one character being each element. A for loop for each element of the array (each character) to spawn
+
+Change how spawn works:
+Spawn(array of objects to spawn and their image)
+[[target, imageTarget], [bullet, imageBeam]];
+
+For each object to spawn, spawn them:
+Switch cases: name of the object to spawn
+Let new object = new Object (etc);

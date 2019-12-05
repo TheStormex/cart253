@@ -4,6 +4,7 @@ class GameState extends State {
   }
 
   draw() {
+    audioSongMenu.stop();
     // the dialogue box
     push();
     rectMode(CENTER);
@@ -93,6 +94,7 @@ class GameState extends State {
         break;
       case 1: // character used X on Y
       if (millis() - textTimer < textTimerAmount) {
+        audioText.play();
         push();
         fill(0);
         textAlign(CENTER,CENTER);
@@ -106,29 +108,32 @@ class GameState extends State {
         break;
       case 2: // character received X
       if (millis() - textTimer < textTimerAmount) {
-      push();
-      fill(0);
-      textAlign(CENTER,CENTER);
-      textSize(width/40+height/40);
-      if (chosenAbility.effectType === "number") {
-        text(chosenAbility.targets.name + " received " + chosenAbility.totalAmount + " " + chosenAbility.effect + " from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
-      } else if (chosenAbility.effectType === "status") {
-        if (chosenAbility.statusCause === true) {
-          text(chosenAbility.targets.name + " was caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
-        } else if (chosenAbility.statusCause === false) {
-          text(chosenAbility.targets.name + " was not caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+        audioText.play();
+        push();
+        fill(0);
+        textAlign(CENTER,CENTER);
+        textSize(width/40+height/40);
+        if (chosenAbility.effectType === "number") {
+          text(chosenAbility.targets.name + " received " + chosenAbility.totalAmount + " " + chosenAbility.effect + " from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+        } else if (chosenAbility.effectType === "status") {
+          if (chosenAbility.statusCause === true) {
+            text(chosenAbility.targets.name + " was caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+          } else if (chosenAbility.statusCause === false) {
+            text(chosenAbility.targets.name + " was not caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+          }
         }
-      }
 
-      pop();
+        pop();
     } else {
       // check if the player wins or loses
       if (player.health <= 0) {
         victory = -1;
+        audioLose.play();
         whichScreen = gameOverState;
       }
       if (enemy.health <= 0) {
         victory = 1;
+        audioWin.play();
         whichScreen = gameOverState;
       }
       if (whoseTurn === 1) { // if it is the player's turn
@@ -166,6 +171,7 @@ class GameState extends State {
       for (var i = 0; i < abilitiesHave.length; i++) {
         if (mouseX > abilitiesHave[i].x-abilitiesHave[i].sizeX/2 && mouseX < abilitiesHave[i].x+abilitiesHave[i].sizeX/2 && mouseY > abilitiesHave[i].y-abilitiesHave[i].sizeY/2 && mouseY < abilitiesHave[i].y+abilitiesHave[i].sizeY/2) {
           // choose this ability, add another card to hand and go to text
+          audioButton.play();
           chosenAbility = abilitiesHave[i];
           abilitiesHave.splice(i, 1);
           textTimer = millis();

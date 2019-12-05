@@ -65,6 +65,17 @@ let imageEnemyBullet;
 let imageEnemyBeam;
 let imageEnemyBolt;
 
+// Music and sound effects
+let audioButton;
+let audioHitByEnemy;
+let audioWin;
+let audioLose;
+let audioGoodHit;
+let audioBadHit;
+let audioText;
+let audioSongMenu;
+let audioSongGame;
+
 // The player object
 let player;
 // The enemy object
@@ -101,6 +112,16 @@ function setup() {
   // Make the canvas fit the screen
   var canvas = createCanvas(windowWidth, windowHeight);
   canvas.style('display', 'block');
+  // Set up the audio
+  audioButton = loadSound('assets/sounds/button.wav');
+  audioHitByEnemy = loadSound('assets/sounds/hitByEnemy.wav');
+  audioWin = loadSound('assets/sounds/win.wav');
+  audioLose = loadSound('assets/sounds/lose.wav');
+  audioGoodHit = loadSound('assets/sounds/goodHit.wav');
+  audioBadHit = loadSound('assets/sounds/badHit.wav');
+  audioText = loadSound('assets/sounds/text.wav');
+  audioSongMenu = loadSound('assets/sounds/bark.wav');
+  audioSongGame = loadSound('assets/sounds/bark.wav');
   start();
 }
 
@@ -434,11 +455,11 @@ function start() {
 
   // Create the player's deck of abilities (20)
   for (var i = 0; i < 8; i++) {
-    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 10, playerShootMinigame, color(255,0,0), 80);
+    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 8, playerShootMinigame, color(255,0,0), 80);
     abilitiesPlayerDeck.push(fireSpear);
   }
   for (var i = 0; i < 3; i++) {
-    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 8, playerCollectMinigame, color(0,255,255), 80);
+    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 6, playerCollectMinigame, color(0,255,255), 80);
     abilitiesPlayerDeck.push(cleanse);
   }
   for (var i = 0; i < 3; i++) {

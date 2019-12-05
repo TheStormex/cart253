@@ -43,6 +43,8 @@ class InstructionsState extends State {
   mousePressed() {
     if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
       // move to game
+      audioButton.play();
+      audioSongGame.loop();
       whichScreen = gameState;
     }
   }

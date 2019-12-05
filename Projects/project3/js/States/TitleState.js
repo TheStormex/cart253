@@ -27,6 +27,8 @@ class TitleState extends State {
   mousePressed() {
     if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
       // move to screen 1
+      audioButton.play();
+      audioSongMenu.loop();
       whichScreen = instructionsState;
     }
   }

@@ -15,6 +15,7 @@ class Obstacle extends MinigameObj {
     // if the player clicks on it, they lose targetsHit
     let d = dist(this.x, this.y, mouseX, mouseY);
     if (d < this.size) {
+      audioBadHit.play();
       minigameHits--;
       if (minigameHits < 0) {
         minigameHits = 0;

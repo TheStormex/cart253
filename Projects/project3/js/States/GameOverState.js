@@ -4,6 +4,7 @@ class GameOverState extends State {
   }
 
   draw() {
+    // audioSongGame.stop();
     push();
     textAlign(CENTER, CENTER);
     textSize(width/40+height/40);
@@ -31,6 +32,7 @@ class GameOverState extends State {
     if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
       // move to game state after resetting
       reset();
+      audioSongGame.loop();
       whichScreen = gameState;
     }
   }

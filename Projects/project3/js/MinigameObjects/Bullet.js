@@ -15,6 +15,7 @@ class Bullet extends MinigameObj {
     let d = dist(this.x, this.y, player.x, player.y);
     if (d < this.size) {
       minigameHits++;
+      audioHitByEnemy.play();
       var removed = bullets.splice(this.index, 1);
     }
   }

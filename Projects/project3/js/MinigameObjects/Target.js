@@ -15,6 +15,7 @@ class Target extends MinigameObj {
     // if the player clicks on it, they gain targetsHit
     let d = dist(this.x, this.y, mouseX, mouseY);
     if (d < this.size) {
+      audioGoodHit.play();
       minigameHits++;
       var removed = targets.splice(this.index, 1);
     }
@@ -26,6 +27,7 @@ class Target extends MinigameObj {
     // if the player touches it, they gain targetsHit
     let d = dist(this.x, this.y, player.x, player.y);
     if (d < this.size) {
+      audioGoodHit.play();
       minigameHits++;
       var removed = targets.splice(this.index, 1);
     }

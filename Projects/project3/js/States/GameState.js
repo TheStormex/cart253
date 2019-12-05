@@ -118,6 +118,7 @@ class GameState extends State {
         } else if (chosenAbility.effectType === "status") {
           if (chosenAbility.statusCause === true) {
             text(chosenAbility.targets.name + " was caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
+            chosenAbility.statusCause = false;
           } else if (chosenAbility.statusCause === false) {
             text(chosenAbility.targets.name + " was not caused the " + chosenAbility.effect + " status from " + chosenAbility.user.name + "'s " + chosenAbility.name + "!", width/2, height-height/4);
           }
@@ -171,6 +172,8 @@ class GameState extends State {
       for (var i = 0; i < abilitiesHave.length; i++) {
         if (mouseX > abilitiesHave[i].x-abilitiesHave[i].sizeX/2 && mouseX < abilitiesHave[i].x+abilitiesHave[i].sizeX/2 && mouseY > abilitiesHave[i].y-abilitiesHave[i].sizeY/2 && mouseY < abilitiesHave[i].y+abilitiesHave[i].sizeY/2) {
           // choose this ability, add another card to hand and go to text
+          console.log(abilitiesHave);
+          console.log(abilitiesPlayerDeck);
           audioButton.play();
           chosenAbility = abilitiesHave[i];
           abilitiesHave.splice(i, 1);

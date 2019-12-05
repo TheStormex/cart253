@@ -13,13 +13,13 @@ class EnemyAvatar extends MinigameObj {
   // if this is shot by the player bullet
   shot() {
     // if the player's bullet touches it, they gain targetsHit
-    let d = dist(this.x, this.y, playerBullet.x, playerBullet.y);
-    if (d < this.size) {
-      minigameHits--;
-      if (minigameHits < 0) {
-        minigameHits = 0;
+    for (var i = 0; i < playerBullets.length; i++) {
+      let d = dist(this.x, this.y, playerBullets[i].x, playerBullets[i].y);
+      if (d < this.size) {
+        minigameHits++;
+        var removed = enemyAvatars.splice(this.index, 1);
+        removed = playerBullets.splice(playerBullets[i], 1);
       }
-      var removed = obstacles.splice(this.index, 1);
     }
   }
   // display
@@ -28,7 +28,7 @@ class EnemyAvatar extends MinigameObj {
   display() {
     push();
     fill(255,0,0);
-    ellipse(this.x, this.y, this.size);
+    image(this.image, this.x, this.y, this.size, this.size);
     pop();
     // if (x < 0 || x > width || y < 0 || y > height) {
     //   var removed = obstacles.splice(this.index, 1);

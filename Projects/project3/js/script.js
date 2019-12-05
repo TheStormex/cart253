@@ -33,6 +33,12 @@ let bullets = [];
 // How many bullets the player ran into / targets the player clicked on - obstacles
 let minigameHits = 0;
 
+// Time to wait before player can fire again in the shootign minigame
+let playerShootTimer;
+
+// Can the player shoot right now
+let playerCanShoot = true;
+
 // Array of targets the player must hit in the mini game
 let targets = [];
 
@@ -155,12 +161,13 @@ function spawn(minigameName) {
             let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), image);
             targets.push(newTarget);
           } else if (whichObject === 1) {
-            let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), image);
+            let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), image);
             obstacles.push(newObstacle);
           }
           break;
         case "shoot":
-          console.log("not yet");
+          let newEnemyAvatar = new EnemyAvatar(0, random(0, height-height/3), random(width/40+height/40, width/25+height/25), random(8, 12), random(-1, 1), imageEnemy);
+          enemyAvatars.push(newEnemyAvatar);
           break;
         case "collect":
           let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), imageLeaf);
@@ -279,12 +286,17 @@ function playerClickMinigame() {
 function playerShootMinigame() {
   let minigameName = "shoot"
   spawn(minigameName); // spawn enemy avatars flying accross screen from left to right
-  // for (var i = 0; i < enemyAvatars.length; i++) {
-  //   enemyAvatars[i].index = enemyAvatars.indexOf(enemyAvatars[i]);
-  //   enemyAvatars[i].move();
-  //   enemyAvatars[i].display();
-  //   enemyAvatars[i].hit();
-  // }
+    for (var i = 0; i < enemyAvatars.length; i++) {
+      enemyAvatars[i].index = enemyAvatars.indexOf(enemyAvatars[i]);
+      enemyAvatars[i].move();
+      enemyAvatars[i].display();
+      enemyAvatars[i].shot();
+    }
+    for (var i = 0; i < playerBullets.length; i++) {
+      playerBullets[i].index = playerBullets.indexOf(enemyAvatars[i]);
+      playerBullets[i].move();
+      playerBullets[i].display();
+    }
   let shootButtons = ["Q", "W", "E", "R"];
     push();
     rectMode(CENTER);
@@ -300,20 +312,37 @@ function playerShootMinigame() {
     }
     pop();
     // if press the corresponding key, a player projectile is fired from the center of the quadrant
-    if (keyIsDown(81)) {
-      console.log("1");
+    if (!playerCanShoot && millis() - playerShootTimer >= 300) {
+      playerCanShoot = true;
     }
+    if (playerCanShoot === true) {
+      if (keyIsDown(81)) {
+        let newPlayerBullet = new PlayerBullet(width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        playerBullets.push(newPlayerBullet);
+        playerCanShoot = false;
+        playerShootTimer = millis();
+      }
 
-    if (keyIsDown(87)) {
-      console.log("2");
-    }
+      if (keyIsDown(87)) {
+        let newPlayerBullet = new PlayerBullet(width/4 + width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        playerBullets.push(newPlayerBullet);
+        playerCanShoot = false;
+        playerShootTimer = millis();
+      }
 
-    if (keyIsDown(69)) {
-      console.log("3");
-    }
+      if (keyIsDown(69)) {
+        let newPlayerBullet = new PlayerBullet(width/4 * 2 + width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        playerBullets.push(newPlayerBullet);
+        playerCanShoot = false;
+        playerShootTimer = millis();
+      }
 
-    if (keyIsDown(82)) {
-      console.log("4");
+      if (keyIsDown(82)) {
+        let newPlayerBullet = new PlayerBullet(width/4 * 3 + width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        playerBullets.push(newPlayerBullet);
+        playerCanShoot = false;
+        playerShootTimer = millis();
+      }
     }
 }
 
@@ -486,11 +515,11 @@ function start() {
 
   // Create the player's deck of abilities (20)
   for (var i = 0; i < 8; i++) {
-    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 8, playerShootMinigame, color(255,0,0), 80);
+    let fireSpear = new Ability("Fire Spear", "Deal damage", player, enemy, "damage", "number", 8, playerShootMinigame, color(255,0,0), 300);
     abilitiesPlayerDeck.push(fireSpear);
   }
   for (var i = 0; i < 3; i++) {
-    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 6, playerCollectMinigame, color(0,255,255), 80);
+    let cleanse = new Ability("Cleanse", "Heal self", player, player, "heal", "number", 6, playerCollectMinigame, color(0,255,255), 150);
     abilitiesPlayerDeck.push(cleanse);
   }
   for (var i = 0; i < 3; i++) {
@@ -498,7 +527,7 @@ function start() {
     abilitiesPlayerDeck.push(paralyse);
   }
   for (var i = 0; i < 3; i++) {
-    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerCollectMinigame, color(0,255,0), 80);
+    let shield = new Ability("Shield", "Protect self", player, player, "% incoming", "number", -5, playerCollectMinigame, color(0,255,0), 150);
     abilitiesPlayerDeck.push(shield);
   }
   for (var i = 0; i < 3; i++) {

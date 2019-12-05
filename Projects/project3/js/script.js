@@ -144,20 +144,44 @@ function mousePressed() {
 // spawn()
 //
 // create objects in the mini games
-function spawn(image) {
+function spawn(minigameName) {
+  let whichMinigame = minigameName;
   if (millis() - spawnTimer > chosenAbility.spawnSpeed) {
     if (whoseTurn === 1) {
-      let whichObject = floor(random(0,2));
-      if (whichObject === 0) {
-        let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), image);
-        targets.push(newTarget);
-      } else if (whichObject === 1) {
-        let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), image);
-        obstacles.push(newObstacle);
+      switch (whichMinigame) {
+        case "click":
+          let whichObject = floor(random(0,2));
+          if (whichObject === 0) {
+            let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), image);
+            targets.push(newTarget);
+          } else if (whichObject === 1) {
+            let newObstacle = new Obstacle(random(0, width), 0, random(width/30+height/30, width/16+width/16), random(-12, 12), random(8, 12), image);
+            obstacles.push(newObstacle);
+          }
+          break;
+        case "shoot":
+          console.log("not yet");
+          break;
+        case "collect":
+          let newTarget = new Target(random(0, width), 0, random(width/30+height/30, width/16+height/16), random(-12, 12), random(8, 12), imageLeaf);
+          targets.push(newTarget);
+          break;
       }
     }
     if (whoseTurn === -1) {
-      let newBullet = new Bullet(random(0, width), 0, random(width/40+height/40, width/30+height/30), random(-12, 12), random(15, 18), image);
+      let bulletImage;
+      switch (whichMinigame) {
+        case "bulletStorm":
+          bulletImage = imageEnemyBullet;
+          break;
+        case "neutronBeam":
+          bulletImage = imageEnemyBeam;
+          break;
+        case "staticBolt":
+          bulletImage = imageEnemyBolt;
+          break;
+      }
+      let newBullet = new Bullet(random(0, width), 0, random(width/40+height/40, width/30+height/30), random(-12, 12), random(15, 18), bulletImage);
       bullets.push(newBullet);
     }
   spawnTimer = millis();
@@ -235,7 +259,8 @@ function goToEnemyTurn() {
 //
 // the player's clicking minigame
 function playerClickMinigame() {
-  spawn(); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  let minigameName = "click"
+  spawn(minigameName); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
   for (var i = 0; i < targets.length; i++) {
     targets[i].index = targets.indexOf(targets[i]);
     targets[i].move();
@@ -252,11 +277,13 @@ function playerClickMinigame() {
 //
 // the player's shooting minigame
 function playerShootMinigame() {
-  // spawn(); // spawn targets (random size and speed) at random at 2 per second, flow accross screen
-  // for (var i = 0; i < targets.length; i++) {
-  //   targets[i].index = targets.indexOf(targets[i]);
-  //   targets[i].move();
-  //   targets[i].display();
+  let minigameName = "shoot"
+  spawn(minigameName); // spawn enemy avatars flying accross screen from left to right
+  // for (var i = 0; i < enemyAvatars.length; i++) {
+  //   enemyAvatars[i].index = enemyAvatars.indexOf(enemyAvatars[i]);
+  //   enemyAvatars[i].move();
+  //   enemyAvatars[i].display();
+  //   enemyAvatars[i].hit();
   // }
   let shootButtons = ["Q", "W", "E", "R"];
     push();
@@ -294,7 +321,8 @@ function playerShootMinigame() {
 //
 // the player's collecting minigame
 function playerCollectMinigame() {
-  spawn(imageLeaf); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
+  let minigameName = "collect";
+  spawn(minigameName); // spawn targets and obstacles (random size and speed) at random at 2 per second, flow accross screen
   minigamePlayer();
   for (var i = 0; i < targets.length; i++) {
     targets[i].index = targets.indexOf(targets[i]);
@@ -309,7 +337,8 @@ function playerCollectMinigame() {
 //
 // minigame for bulletStorm
 function enemyBulletStormMinigame() {
-  spawn(imageEnemyBullet); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  let minigameName = "bulletStorm";
+  spawn(minigameName); // spawn bullets (random size and speed) that fly accross the screen 3 per second
   minigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
@@ -324,7 +353,8 @@ function enemyBulletStormMinigame() {
 //
 // minigame for neutron beam
 function enemyNeutronBeamMinigame() {
-  spawn(imageEnemyBeam); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  let minigameName = "neutronBeam";
+  spawn(minigameName); // spawn bullets (random size and speed) that fly accross the screen 3 per second
   minigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
@@ -340,7 +370,8 @@ function enemyNeutronBeamMinigame() {
 //
 // minigame for static bolt
 function enemyStaticBoltMinigame() {
-  spawn(imageEnemyBolt); // spawn bullets (random size and speed) that fly accross the screen 3 per second
+  let minigameName = "staticBolt";
+  spawn(minigameName); // spawn bullets (random size and speed) that fly accross the screen 3 per second
   minigamePlayer();
   // move and display all bullets and check if they touch the player
   for (var i = 0; i < bullets.length; i++) {
@@ -484,10 +515,10 @@ function start() {
   console.log(abilitiesHave);
   console.log(abilitiesPlayerDeck);
   // create the list of enemy abilities
-  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 500);
+  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 300);
   enemyAbilitiesHave.push(newEnemyAbility);
   newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", "number", 10, enemyBulletStormMinigame, color(0), 80);
   enemyAbilitiesHave.push(newEnemyAbility);
-  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", "status", 3, enemyStaticBoltMinigame, color(255, 255, 0), 350);
+  newEnemyAbility = new Ability("Static Bolt", "stun player if touch 3 times", enemy, player, "stun", "status", 3, enemyStaticBoltMinigame, color(255, 255, 0), 150);
   enemyAbilitiesHave.push(newEnemyAbility);
 }

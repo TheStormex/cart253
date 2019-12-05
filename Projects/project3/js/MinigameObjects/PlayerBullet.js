@@ -3,7 +3,7 @@
 // The player's bullets in the shooting mini game
 
 
-class Player Bullet extends MinigameObj {
+class PlayerBullet extends MinigameObj {
   constructor(x, y, size, vx, vy, image) {
     // To MinigameObj
     super(x, y, size, vx, vy, image);

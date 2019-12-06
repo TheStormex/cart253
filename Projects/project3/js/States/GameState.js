@@ -36,7 +36,7 @@ class GameState extends State {
     let lifeBarSizePlayer = map(player.health*100/player.maxHealth,0,100,0,width-width/4);
     rect(width/5, height/2+height/30, lifeBarSizePlayer, height/10);
     textAlign(CENTER,CENTER);
-    textSize(width/30);
+    textSize(width/60+height/60);
     fill(0);
     text(player.health + "/" + player.maxHealth, width/2, height/2+height/10);
     pop();
@@ -47,7 +47,7 @@ class GameState extends State {
     fill(255);
     rect(width/50, height/50, width/3, height/5);
     textAlign(LEFT, BASELINE);
-    textSize(width/50);
+    textSize(width/100+height/100);
     fill(0);
     text(player.name + "'s Incoming Damage: " + player.incoming + "%", width/40, height/10);
     text(enemy.name + "'s Incoming Damage: " + enemy.incoming + "%", width/40, height/6);
@@ -61,7 +61,7 @@ class GameState extends State {
     push();
     fill(255);
     textAlign(CENTER,CENTER);
-    textSize(width/30);
+    textSize(width/60+height/60);
     text(enemy.name,width/2,height/10);
     pop();
     // the enemy's health bar
@@ -76,7 +76,7 @@ class GameState extends State {
     let lifeBarSizeEnemy = map(enemy.health*100/enemy.maxHealth,0,100, 0,width/8);
     rect(width/2-width/16, height/6, lifeBarSizeEnemy, height/20);
     textAlign(CENTER,CENTER);
-    textSize(width/60);
+    textSize(width/120+height/120);
     fill(0);
     text(enemy.health + "/" + enemy.maxHealth, width/2, height/6+height/30);
     pop();

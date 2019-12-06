@@ -19,6 +19,8 @@ class MinigameState extends State {
         obstacles = [];
         targets = [];
         bullets = [];
+        enemyAvatars = [];
+        playerBullets = [];
         textTimer = millis();
         abilityHappens();
         minigameHits = 0;

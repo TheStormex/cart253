@@ -242,9 +242,11 @@ function abilityHappens() {
 // Go from the enemy's turn to the player's turn
 function goToPlayerTurn() {
   textTimer = millis();
-  // the player gets another ability from the deck
-  abilitiesHave.push(abilitiesPlayerDeck[0]);
-  abilitiesPlayerDeck.splice(0, 1);
+  // the player gets another ability from the deck if there are cards left
+  if (abilitiesPlayerDeck.length > 0) {
+    abilitiesHave.push(abilitiesPlayerDeck[0]);
+    abilitiesPlayerDeck.splice(0, 1);
+  }
   chosenAbility = 0;
   whoseTurn = 1;
   subScreen = 0;

@@ -126,8 +126,8 @@ function setup() {
   audioGoodHit = loadSound('assets/sounds/goodHit.wav');
   audioBadHit = loadSound('assets/sounds/badHit.wav');
   audioText = loadSound('assets/sounds/text.wav');
-  audioSongMenu = loadSound('assets/sounds/bark.wav');
-  audioSongGame = loadSound('assets/sounds/bark.wav');
+  audioSongMenu = loadSound('assets/sounds/gameSong.wav');
+  audioSongGame = loadSound('assets/sounds/gameSong.wav');
   start();
 }
 

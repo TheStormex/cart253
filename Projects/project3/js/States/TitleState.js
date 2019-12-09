@@ -17,7 +17,7 @@ class TitleState extends State {
     pop();
     // Title text
     push();
-    textSize(width/20+height/20);
+    textSize(width/20 + height/20);
     fill(255);
     textAlign(CENTER, CENTER);
     text("Wizard Vs. Killer Robot", width/2, height/5);
@@ -25,7 +25,6 @@ class TitleState extends State {
   }
 
   mousePressed() {
-    console.log(width/30+height/30);
     if (mouseX > width/2-width/10 && mouseX < width/2+width/10 && mouseY > height-height/4-height/10 && mouseY < height-height/4+height/10) {
       // move to screen 1
       audioButton.play();

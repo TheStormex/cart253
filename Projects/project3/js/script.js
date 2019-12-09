@@ -455,54 +455,6 @@ function minigamePlayer() {
   pop();
 }
 
-// makeText()
-//
-// Take text to spawn, choose the correct size and spawn the text to fix the box
-function makeText(textHere, startX, startY, containerWidth, size) {
-  let originalText = textHere; // 'this is a text'
-  let textArray = split(originalText, ''); // [t, h, i, s, , i, s, ...]
-  let textLines = []; // [line 1, line 2, line 3] strings
-  let textX = startX;
-  let textY = startY;
-  let boxWidth = containerWidth;
-  let textSizeIs = size;
-  let lettersPerLine = floor(boxWidth / (textSizeIs/2)); // ex: 10
-  let thisLine = []; // The current line [this ,is ,a ,text ]
-  let thisLineCharCount = 0; // How many letters this line has
-  while (textArray.length > 0) { // Until all characters are put into words then lines
-    let thisWord = [];
-      while (textArray[0] != ' ' && textArray.length != 0) { // Until the word ends with a space or runs out
-        thisWord.push(textArray[0]);
-        textArray.splice(0, 1);
-      }
-      thisWord.push(textArray[0]); // Add the space into the word
-      textArray.splice(0, 1);
-      // thisWord now contains a whole word plus a space
-      // if this word when put together with the other word(s) of this
-      // line is less than or equal to the length, then do so, if it
-      // exceeds it, then go to next line and make this word the first
-      // word of the line.
-      if (thisLineCharCount + thisWord.length <= lettersPerLine) {
-        let thisWordString = join(thisWord, '');
-        thisLine.push(thisWordString);
-        thisLineCharCount += thisWord.length;
-      } else {
-        let thisLineString = join(thisLine, ' '); // make a string of the line
-        textLines.push(thisLineString); // put the new line into the lines array
-        thisLine = [thisWord];
-        thisLineCharCount = thisWord.length;
-      }
-    // if there are characters left in textArray, repeat
-  }
-  for (var i = 0; i < textLines.length; i++) {
-    push()
-    textSize(textSizeIs);
-    text(textLines[i], startX, startY + textSizeIs * i);
-    pop();
-  }
-
-}
-
 // reset()
 //
 // Reset all stats and start the game again
@@ -591,8 +543,8 @@ function start() {
     abilitiesHave.push(abilitiesPlayerDeck[0]);
     abilitiesPlayerDeck.splice(0, 1);
   }
-  // console.log(abilitiesHave);
-  // console.log(abilitiesPlayerDeck);
+  console.log(abilitiesHave);
+  console.log(abilitiesPlayerDeck);
   // create the list of enemy abilities
   let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 300);
   enemyAbilitiesHave.push(newEnemyAbility);

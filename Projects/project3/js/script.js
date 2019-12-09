@@ -126,6 +126,7 @@ function setup() {
   audioGoodHit = loadSound('assets/sounds/goodHit.wav');
   audioBadHit = loadSound('assets/sounds/badHit.wav');
   audioText = loadSound('assets/sounds/text.wav');
+   // My computer with the music program broke, so I have to use the same music from Project 2
   audioSongMenu = loadSound('assets/sounds/gameSong.wav');
   audioSongGame = loadSound('assets/sounds/gameSong.wav');
   start();

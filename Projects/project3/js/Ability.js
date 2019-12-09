@@ -51,7 +51,7 @@ class Ability {
     textSize(width/50+height/50);
     textAlign(CENTER,CENTER);
     text(this.name, this.x , this.y-this.y/8);
-    textSize(width/60+height/60);
+    textSize(width/80+height/80);
     text(this.text, this.x, this.y+height/20);
     pop();
   }

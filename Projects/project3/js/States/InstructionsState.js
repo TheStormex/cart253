@@ -28,7 +28,7 @@ class InstructionsState extends State {
     rectMode(CENTER);
     rect(width/2,height/4+height/6,width-width/10,height/2-height/20);
     fill(0);
-    textSize(width/40+height/60);
+    textSize(width/50+height/50);
     textAlign(CENTER,CENTER);
     text("You are a powerful wizard who can cast spells", width/2, height/4);
     text("A killer robot stands in your way with giant guns", width/2, height/4+height/18);

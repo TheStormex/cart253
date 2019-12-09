@@ -315,33 +315,33 @@ function playerShootMinigame() {
     }
     pop();
     // if press the corresponding key, a player projectile is fired from the center of the quadrant
-    if (!playerCanShoot && millis() - playerShootTimer >= 300) {
+    if (!playerCanShoot && millis() - playerShootTimer >= 500) {
       playerCanShoot = true;
     }
     if (playerCanShoot === true) {
       if (keyIsDown(81)) {
-        let newPlayerBullet = new PlayerBullet(width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        let newPlayerBullet = new PlayerBullet(width/8, height, width/40+height/40, 0, -15, imagePlayerBullet);
         playerBullets.push(newPlayerBullet);
         playerCanShoot = false;
         playerShootTimer = millis();
       }
 
       if (keyIsDown(87)) {
-        let newPlayerBullet = new PlayerBullet(width/4 + width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        let newPlayerBullet = new PlayerBullet(width/4 + width/8, height, width/40+height/40, 0, -15, imagePlayerBullet);
         playerBullets.push(newPlayerBullet);
         playerCanShoot = false;
         playerShootTimer = millis();
       }
 
       if (keyIsDown(69)) {
-        let newPlayerBullet = new PlayerBullet(width/4 * 2 + width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        let newPlayerBullet = new PlayerBullet(width/4 * 2 + width/8, height, width/40+height/40, 0, -15, imagePlayerBullet);
         playerBullets.push(newPlayerBullet);
         playerCanShoot = false;
         playerShootTimer = millis();
       }
 
       if (keyIsDown(82)) {
-        let newPlayerBullet = new PlayerBullet(width/4 * 3 + width/8, height, width/40+height/40, 0, -10, imagePlayerBullet);
+        let newPlayerBullet = new PlayerBullet(width/4 * 3 + width/8, height, width/40+height/40, 0, -15, imagePlayerBullet);
         playerBullets.push(newPlayerBullet);
         playerCanShoot = false;
         playerShootTimer = millis();
@@ -547,7 +547,7 @@ function start() {
   console.log(abilitiesHave);
   console.log(abilitiesPlayerDeck);
   // create the list of enemy abilities
-  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 10% per hit", enemy, player, "% incoming", "number", 10, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 300);
+  let newEnemyAbility = new Ability("Neutron Beam", "weaken player by 15% per hit", enemy, player, "% incoming", "number", 15, enemyNeutronBeamMinigame, color(random(0, 255), random(0, 255), random(0, 255)), 300);
   enemyAbilitiesHave.push(newEnemyAbility);
   newEnemyAbility = new Ability("BulletStorm", "deal damage", enemy, player, "damage", "number", 10, enemyBulletStormMinigame, color(0), 80);
   enemyAbilitiesHave.push(newEnemyAbility);
